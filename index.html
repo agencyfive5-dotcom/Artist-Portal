@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Soundclaim Artist Portal</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'DM Sans',sans-serif;}
+body{background:#090910;color:#EEEEf8;min-height:100vh;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fade-up{animation:fadeUp 0.3s ease both;}
+input:focus{border-color:#7C5CFC!important;box-shadow:0 0 0 3px rgba(124,92,252,0.12)!important;outline:none;}
+button:active{opacity:0.85;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#3A3A55;border-radius:2px;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef}=React;
+
+const T={
+  bg:'#090910',surf:'#0F0F1A',card:'#141420',bdr:'rgba(255,255,255,0.06)',bdrM:'rgba(255,255,255,0.10)',
+  text:'#EEEEf8',sub:'#8888AA',faint:'#3A3A55',
+  accent:'#7C5CFC',accentL:'#9D82FF',accentD:'#5A3DD4',
+  accentBg:'rgba(124,92,252,0.12)',accentBdr:'rgba(124,92,252,0.35)',
+  green:'#2ECC8A',greenBg:'rgba(46,204,138,0.10)',
+  amber:'#F0A840',amberBg:'rgba(240,168,64,0.10)',
+  red:'#F05C5C',redBg:'rgba(240,92,92,0.10)',
+  blue:'#4AADE8',blueBg:'rgba(74,173,232,0.10)',
+  samro:'#E8A23C',capasso:'#4AADE8',sampra:'#2ECC8A',airco:'#9D82FF',
+};
+
+const ARTISTS=[
+  {
+    id:'busta929',stageName:'Busta 929',legalName:'Thapelo Theo Ndou',initials:'B9',color:'#1A5FA3',
+    email:'busta929@soundclaim.co.za',password:'busta929',consultant:'Jerome Lindsey Arends',plan:'Premium',
+    entity:'Thupa Industry',distributor:'Electromode',
+    cmo:{
+      samro:{status:'registered',memberNum:'SAM-2019-04471',lastCollection:'Q2 2024',lastAmount:28400,nextExpected:'Q4 2025'},
+      capasso:{status:'registered',memberNum:'PCA-THUPAINDUSTRY',lastCollection:'Q1 2024',lastAmount:142600,nextExpected:'Q3 2025'},
+      sampra:{status:'in_progress',stage:2,stages:['Documents prepared','Submitted','Under review','Registered'],nextExpected:'Est. Q1 2026'},
+      airco:{status:'not_registered',note:'Agency 5 is assessing eligibility. CRBT income from MTN estimated at R18,000 to R35,000 per year.'},
+    },
+    tracks:[
+      {title:'Umsebenzi Wethu',isrc:'ZA-RT5-21-00234',samro:true,capasso:true,sampra:false,split:true},
+      {title:'Sithi Sithi',isrc:'ZA-RT5-21-00291',samro:true,capasso:true,sampra:false,split:true},
+      {title:'VSOP feat. Reece Madlisa',isrc:'ZA-RT5-21-00298',samro:true,capasso:true,sampra:false,split:false},
+      {title:'Ngixolele feat. Boohle',isrc:'ZA-RT5-20-00187',samro:true,capasso:false,sampra:false,split:false},
+      {title:'Mmapula feat. Mzu M',isrc:'ZA-RT5-21-00312',samro:true,capasso:true,sampra:false,split:true},
+      {title:'Dakiwe',isrc:'ZA-RT5-22-00041',samro:true,capasso:false,sampra:false,split:false},
+      {title:'Gqoz Gqoz feat. Mafidzodzo',isrc:'ZA-RT5-21-00401',samro:true,capasso:true,sampra:false,split:true},
+      {title:'Beke Le Beke',isrc:'ZA-RT5-22-00089',samro:false,capasso:false,sampra:false,split:false},
+    ],
+    financials:{
+      collected:171000,pending:38400,nextDate:'2026-07-15',
+      remittances:[
+        {id:'r1',date:'2026-01-15',amount:54200,source:'CAPASSO Q3 2025',status:'paid'},
+        {id:'r2',date:'2025-07-15',amount:48600,source:'CAPASSO Q1 2025 + SAMRO Q2 2025',status:'paid'},
+        {id:'r3',date:'2025-01-15',amount:68200,source:'CAPASSO Q3 2024 + SAMRO Q4 2024',status:'paid'},
+      ],
+      statements:[
+        {id:'s1',source:'Electromode',period:'Jan 2024',type:'Master royalties',status:'Discrepancy flagged',flag:'Unexplained debit balance of R36,629'},
+        {id:'s2',source:'CAPASSO',period:'Q1 2024',type:'Publishing (mechanical)',status:'Reviewed'},
+        {id:'s3',source:'SAMRO',period:'Q2 2024',type:'Broadcast',status:'Reviewed'},
+        {id:'s4',source:'Electromode',period:'Q3 2022',type:'Master royalties',status:'Missing — demand sent'},
+      ],
+      cmoHistory:[
+        {cmo:'capasso',schedule:'Bi-annual',scheduleNote:'Pays in Jan & Jul',nextExpected:'Jul 2026',entries:[
+          {period:'Q3 2025',gross:67750,date:'2025-10-31',status:'remitted'},
+          {period:'Q1 2025',gross:42500,date:'2025-04-30',status:'remitted'},
+          {period:'Q3 2024',gross:55000,date:'2024-10-31',status:'remitted'},
+        ]},
+        {cmo:'samro',schedule:'Quarterly',scheduleNote:'Mar, Jun, Sep, Dec',nextExpected:'Sep 2026',entries:[
+          {period:'Q2 2025',gross:18250,date:'2025-09-01',status:'remitted'},
+          {period:'Q4 2024',gross:30250,date:'2025-03-01',status:'remitted'},
+          {period:'Q2 2024',gross:28400,date:'2024-09-01',status:'pending'},
+        ]},
+        {cmo:'sampra',schedule:'Annual',scheduleNote:'Jul each year',nextExpected:'Jul 2027 est. — pending registration',entries:[]},
+        {cmo:'airco',schedule:'Quarterly',scheduleNote:'Quarterly when registered',nextExpected:'TBD — not yet registered',entries:[]},
+      ],
+      dspHistory:[
+        {source:'Electromode (DSP)',type:'dsp',schedule:'Monthly',scheduleNote:'Streams: Spotify, Apple Music, YouTube Music etc.',nextExpected:'Ongoing monthly',entries:[
+          {period:'Q4 2025',gross:38400,date:'2026-01-30',status:'pending'},
+          {period:'Jan 2024',gross:null,date:'2024-03-15',status:'dispute',note:'R36,629 debit balance — unexplained by distributor'},
+          {period:'Q3 2022',gross:null,date:null,status:'missing'},
+        ]},
+        {source:'CRBT via MTN (Electromode)',type:'crbt',schedule:'Quarterly',scheduleNote:'Ringtone & ringback tone downloads',nextExpected:'Q1 2026 est.',entries:[
+          {period:'Q3 2025',gross:8200,date:'2025-10-30',status:'pending'},
+        ],note:'Est. R18k–R35k/year from MTN alone. Feeds AIRCO income once registered.'},
+      ],
+    },
+    actions:[
+      {id:'a1',type:'split_sheet',title:'Split sheet pending — VSOP feat. Reece Madlisa',detail:'The split sheet for VSOP has not been signed by all parties. Your share is confirmed at 45%. Reece Madlisa camp has not responded. Agency 5 is following up.',urgency:'amber',date:'2026-04-12'},
+      {id:'a2',type:'split_sheet',title:'Split sheet pending — Ngixolele feat. Boohle',detail:'Ngixolele split sheet unsigned. Your composition share is 50%. Agency 5 is chasing management for signature.',urgency:'amber',date:'2026-04-05'},
+      {id:'a3',type:'document',title:'SAMPRA registration — ID document required',detail:'Your SAMPRA neighbouring rights registration requires a certified copy of your ID document. Please send to Jerome at Agency 5 via WhatsApp or email.',urgency:'red',date:'2026-05-02'},
+      {id:'a4',type:'confirm',title:'Confirm Beke Le Beke composition credits',detail:'Agency 5 needs confirmation of all composition contributors to Beke Le Beke before CAPASSO notification can proceed. Please provide the full credit list.',urgency:'amber',date:'2026-04-28'},
+    ],
+    activity:[
+      {date:'2026-05-08',text:'Contract Compass analysis completed for Electromode distribution agreement — 3 red flags identified. Jerome has reviewed.',type:'compass'},
+      {date:'2026-05-03',text:'SAMPRA registration submitted. Stage 2 of 4 complete. Under review. Est. completion Q1 2026.',type:'cmo'},
+      {date:'2026-04-15',text:'Demand letter sent to Electromode regarding the unexplained R36,629 debit balance on your January 2024 statement.',type:'dispute'},
+      {date:'2026-04-12',text:'Agency 5 submitted follow-up to Reece Madlisa management regarding unsigned VSOP split sheet.',type:'action'},
+      {date:'2026-03-20',text:'Remittance of R54,200 processed — CAPASSO Q3 2025 collections net of 20% commission.',type:'payment'},
+      {date:'2026-03-01',text:'CAPASSO quarterly statement received Q3 2025. Total R67,750. No discrepancies.',type:'statement'},
+    ],
+    compass:{
+      has:true,shared:true,name:'Electromode Distribution Agreement',score:4,
+      assessment:'This agreement has several clauses that significantly favour the distributor over the artist. The auto-renewal provision and broad cross-collateralisation clause are the most concerning.',
+      redFlags:3,amberFlags:4,autoRenewal:true,noticeDeadline:'2026-09-15',daysLeft:128,
+    },
+    messages:[
+      {id:'m1',from:'Jerome',initials:'JL',color:'#C9951A',text:'Hi Thapelo — the SAMPRA registration is now in progress. We submitted all documents on 3 May. You should expect confirmation within 8 to 12 weeks. Once registered, we will start tracking your neighbouring rights income.',date:'2026-05-04',fromConsultant:true},
+      {id:'m2',from:'Busta 929',initials:'B9',color:'#1A5FA3',text:'Thanks Jerome. What about the Electromode situation — any response from them on the R36k?',date:'2026-05-05',fromConsultant:false},
+      {id:'m3',from:'Jerome',initials:'JL',color:'#C9951A',text:'Not yet. We sent the formal demand letter on 15 April. They have 21 days to respond. If no response by 6 May, we escalate to a Section 65 notice. Nothing for you to do on this — we are handling it.',date:'2026-05-06',fromConsultant:true},
+    ],
+  },
+  {
+    id:'mthunzi',stageName:'Mthunzi',legalName:'Njabulo Mthunzi Ndimande',initials:'MT',color:'#0F6E56',
+    email:'mthunzi@soundclaim.co.za',password:'mthunzi1',consultant:'Jerome Lindsey Arends',plan:'Standard',
+    entity:'Space Bar Music',distributor:'Piano Hub (Kabza)',
+    cmo:{
+      samro:{status:'in_progress',stage:3,stages:['Documents prepared','Submitted','Under review','Registered'],nextExpected:'Est. Q3 2025'},
+      capasso:{status:'registered',memberNum:'',lastCollection:'Q2 2024',lastAmount:18400,nextExpected:'Q4 2025'},
+      sampra:{status:'not_registered',note:'Setup required. Agency 5 will begin SAMPRA registration once SAMRO is complete.'},
+      airco:{status:'not_registered',note:'To be assessed after SAMPRA registration.'},
+    },
+    tracks:[
+      {title:'Imithandazo',isrc:'ZA-AA3-23-00101',samro:false,capasso:true,sampra:false,split:true},
+      {title:'Amazwe feat. MaWhoo',isrc:'ZA-AA3-23-00102',samro:false,capasso:true,sampra:false,split:false},
+      {title:'Isibusiso',isrc:'ZA-AA3-23-00103',samro:false,capasso:false,sampra:false,split:false},
+      {title:'Umoya Wami',isrc:'ZA-AA3-22-00089',samro:false,capasso:true,sampra:false,split:true},
+    ],
+    financials:{
+      collected:18400,pending:0,nextDate:'2026-07-15',
+      remittances:[{id:'r1',date:'2026-01-15',amount:14720,source:'CAPASSO Q3 2025',status:'paid'}],
+      statements:[
+        {id:'s1',source:'CAPASSO',period:'Q3 2025',type:'Publishing (mechanical)',status:'Reviewed'},
+        {id:'s2',source:'Piano Hub',period:'Nov 2023',type:'Master royalties',status:'Missing — 3 periods overdue'},
+      ],
+      cmoHistory:[
+        {cmo:'capasso',schedule:'Bi-annual',scheduleNote:'Pays in Jan & Jul',nextExpected:'Jul 2026',entries:[
+          {period:'Q3 2025',gross:18400,date:'2025-10-31',status:'remitted'},
+        ]},
+        {cmo:'samro',schedule:'Quarterly',scheduleNote:'Mar, Jun, Sep, Dec',nextExpected:'Pending registration',entries:[]},
+        {cmo:'sampra',schedule:'Annual',scheduleNote:'Jul each year',nextExpected:'TBD — pending SAMRO completion',entries:[]},
+        {cmo:'airco',schedule:'Quarterly',scheduleNote:'Quarterly when registered',nextExpected:'TBD — not yet assessed',entries:[]},
+      ],
+      dspHistory:[
+        {source:'Piano Hub (Kabza)',type:'dsp',schedule:'Bi-annual',scheduleNote:'Streams on digital platforms',nextExpected:'Overdue — formal notice issued',entries:[
+          {period:'Nov 2024',gross:null,date:null,status:'missing'},
+          {period:'May 2024',gross:null,date:null,status:'missing'},
+          {period:'Nov 2023',gross:null,date:null,status:'missing'},
+        ],note:'3 consecutive periods missing. Agency 5 has issued formal notice to Piano Hub.'},
+      ],
+    },
+    actions:[
+      {id:'a1',type:'document',title:'Piano Hub statements — 3 periods missing',detail:'No royalty statements received from Piano Hub for November 2023, May 2024, and November 2024. Agency 5 has issued formal notice.',urgency:'red',date:'2026-04-20'},
+      {id:'a2',type:'split_sheet',title:'Amazwe — split sheet signature needed',detail:'MaWhoo camp has not signed the split sheet for Amazwe. Your share is confirmed at 50%. Agency 5 is following up.',urgency:'amber',date:'2026-03-15'},
+    ],
+    activity:[
+      {date:'2026-05-03',text:'SAMRO registration is now at stage 3 (under review). Expected completion Q3 2025.',type:'cmo'},
+      {date:'2026-04-20',text:'Formal notice sent to Piano Hub regarding 3 missing royalty statements.',type:'dispute'},
+      {date:'2026-01-15',text:'Remittance of R14,720 processed — CAPASSO Q3 2025 net of commission.',type:'payment'},
+    ],
+    compass:{has:false,shared:false},
+    messages:[
+      {id:'m1',from:'Jerome',initials:'JL',color:'#C9951A',text:'Hi Njabulo — SAMRO is now in the final review stage. We expect confirmation within 4 to 6 weeks. Once registered, all past broadcast income from the Khabza album campaign will be claimable.',date:'2026-05-03',fromConsultant:true},
+    ],
+  },
+];
+
+const CMO_META={
+  samro:{label:'SAMRO',color:T.samro,desc:'Performance & broadcast'},
+  capasso:{label:'CAPASSO',color:T.capasso,desc:'Mechanical / publishing'},
+  sampra:{label:'SAMPRA',color:T.sampra,desc:'Neighbouring rights'},
+  airco:{label:'AIRCO',color:T.accentL,desc:'RBT / CRBT income'},
+};
+
+function fmtR(n){if(!n&&n!==0)return'—';return'R '+n.toLocaleString('en-ZA',{minimumFractionDigits:0});}
+function fmtDate(d){return new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});}
+function ago(d){
+  const days=Math.floor((new Date()-new Date(d))/(86400000));
+  if(days===0)return'Today';if(days===1)return'Yesterday';
+  if(days<7)return days+'d ago';if(days<30)return Math.floor(days/7)+'w ago';
+  return Math.floor(days/30)+'mo ago';
+}
+
+function Pill({status,small}){
+  const m={registered:{l:'Registered',c:T.green,bg:T.greenBg},in_progress:{l:'In progress',c:T.amber,bg:T.amberBg},not_registered:{l:'Not registered',c:T.sub,bg:'rgba(255,255,255,0.04)'},unknown:{l:'Unknown',c:T.sub,bg:'rgba(255,255,255,0.04)'}}[status]||{l:'Unknown',c:T.sub,bg:'rgba(255,255,255,0.04)'};
+  const s=small?9:10,p=small?'1px 6px':'2px 8px';
+  return <span style={{fontSize:s,fontWeight:600,padding:p,borderRadius:20,background:m.bg,color:m.c,textTransform:'uppercase',letterSpacing:'0.05em',border:`1px solid ${m.c}30`}}>{m.l}</span>;
+}
+
+function Av({initials,color,size=38}){
+  return <div style={{width:size,height:size,borderRadius:Math.floor(size/3),background:color,display:'flex',alignItems:'center',justifyContent:'center',fontSize:Math.floor(size*0.32),fontWeight:700,color:'#fff',flexShrink:0}}>{initials}</div>;
+}
+
+function Icon({type}){
+  const col={cmo:T.green,payment:T.accentL,dispute:T.red,statement:T.blue,action:T.amber,compass:T.accent}[type]||T.accent;
+  return <div style={{width:24,height:24,borderRadius:'50%',background:`${col}18`,border:`1px solid ${col}30`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:col,fontSize:10}}>
+    {type==='payment'?'$':type==='cmo'?'★':type==='dispute'?'!':type==='statement'?'≡':type==='compass'?'◎':'●'}
+  </div>;
+}
+
+function LoginScreen({onLogin}){
+  const [email,setEmail]=useState('');
+  const [pass,setPass]=useState('');
+  const [show,setShow]=useState(false);
+  const [err,setErr]=useState('');
+  const [loading,setLoading]=useState(false);
+
+  function attempt(){
+    if(!email.trim()||!pass.trim())return;
+    setErr('');setLoading(true);
+    setTimeout(()=>{
+      const a=ARTISTS.find(x=>x.email.toLowerCase()===email.trim().toLowerCase()&&x.password===pass.trim());
+      if(a)onLogin(a); else{setErr('Email or password not recognised.');setLoading(false);}
+    },700);
+  }
+
+  const inp={width:'100%',padding:'12px 14px',background:'rgba(255,255,255,0.05)',border:`1px solid ${T.bdrM}`,borderRadius:10,color:T.text,outline:'none',fontSize:14,fontFamily:'inherit',boxSizing:'border-box'};
+
+  return <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:'100vh',background:T.bg,padding:24}}>
+    <div className="fade-up" style={{width:'100%',maxWidth:380}}>
+      <div style={{textAlign:'center',marginBottom:32}}>
+        <div style={{width:60,height:60,borderRadius:16,background:`linear-gradient(135deg,${T.accent},${T.accentD})`,display:'inline-flex',alignItems:'center',justifyContent:'center',marginBottom:12,boxShadow:`0 8px 32px ${T.accentBg}`}}>
+          <svg width="26" height="26" fill="none" stroke="#fff" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div style={{fontSize:22,fontWeight:700,color:T.text}}>Soundclaim</div>
+        <div style={{fontSize:11,color:T.sub,letterSpacing:'0.14em',textTransform:'uppercase',marginTop:2}}>Artist Portal</div>
+      </div>
+
+      <div style={{background:T.surf,borderRadius:16,border:`1px solid ${T.bdr}`,padding:28,marginBottom:14}}>
+        <div style={{fontSize:16,fontWeight:600,color:T.text,marginBottom:4}}>Sign in</div>
+        <div style={{fontSize:13,color:T.sub,marginBottom:22}}>Your music. Your money. Your rights.</div>
+        <div style={{marginBottom:12}}>
+          <div style={{fontSize:12,color:T.sub,marginBottom:5,fontWeight:500}}>Email address</div>
+          <input style={inp} value={email} onChange={e=>setEmail(e.target.value)} placeholder="your.name@soundclaim.co.za" onKeyDown={e=>e.key==='Enter'&&attempt()}/>
+        </div>
+        <div style={{marginBottom:18}}>
+          <div style={{fontSize:12,color:T.sub,marginBottom:5,fontWeight:500}}>Password</div>
+          <div style={{position:'relative'}}>
+            <input style={{...inp,paddingRight:52}} type={show?'text':'password'} value={pass} onChange={e=>setPass(e.target.value)} placeholder="Enter your password" onKeyDown={e=>e.key==='Enter'&&attempt()}/>
+            <button onClick={()=>setShow(!show)} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',color:T.sub,cursor:'pointer',fontSize:11,padding:4}}>{show?'Hide':'Show'}</button>
+          </div>
+        </div>
+        {err&&<div style={{fontSize:12,color:T.red,background:T.redBg,padding:'8px 12px',borderRadius:8,marginBottom:12,textAlign:'center'}}>{err}</div>}
+        <button onClick={attempt} disabled={loading||!email.trim()||!pass.trim()} style={{width:'100%',padding:13,borderRadius:10,border:'none',background:loading?T.faint:`linear-gradient(135deg,${T.accent},${T.accentD})`,color:loading?T.sub:'#fff',fontSize:14,fontWeight:600,cursor:loading?'default':'pointer',fontFamily:'inherit'}}>
+          {loading?'Signing in...':'Sign in'}
+        </button>
+      </div>
+
+      <div style={{background:T.surf,borderRadius:10,border:`1px solid ${T.bdr}`,padding:14}}>
+        <div style={{fontSize:10,color:T.sub,marginBottom:8,textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:600}}>Demo accounts</div>
+        {ARTISTS.map(a=><div key={a.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'5px 0',borderBottom:`1px solid ${T.bdr}`}}>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <Av initials={a.initials} color={a.color} size={20}/>
+            <span style={{fontSize:12,color:T.sub}}>{a.email}</span>
+          </div>
+          <span style={{fontSize:11,color:T.accent,fontFamily:'DM Mono'}}>{a.password}</span>
+        </div>)}
+      </div>
+      <div style={{textAlign:'center',marginTop:12,fontSize:11,color:T.faint}}>Agency 5 (Pty) Ltd · Authorised personnel only</div>
+    </div>
+  </div>;
+}
+
+function BottomNav({tab,setTab,redCount}){
+  const items=[
+    {id:'home',label:'Home',ico:'⌂'},
+    {id:'cmo',label:'CMO',ico:'★'},
+    {id:'tracks',label:'Tracks',ico:'♫'},
+    {id:'money',label:'Money',ico:'$'},
+    {id:'actions',label:'Actions',ico:'○',badge:redCount},
+    {id:'messages',label:'Messages',ico:'✉'},
+  ];
+  return <nav style={{position:'fixed',bottom:0,left:'50%',transform:'translateX(-50%)',width:'100%',maxWidth:430,background:T.surf,borderTop:`1px solid ${T.bdr}`,display:'flex',zIndex:100,paddingBottom:8}}>
+    {items.map(it=>{
+      const active=tab===it.id;
+      return <button key={it.id} onClick={()=>setTab(it.id)} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:2,padding:'8px 4px 4px',background:'transparent',border:'none',cursor:'pointer',color:active?T.accent:T.faint,position:'relative'}}>
+        <div style={{position:'relative',fontSize:18,lineHeight:1}}>
+          {it.ico}
+          {it.badge>0&&<span style={{position:'absolute',top:-4,right:-8,width:14,height:14,borderRadius:'50%',background:T.red,display:'flex',alignItems:'center',justifyContent:'center',fontSize:8,fontWeight:700,color:'#fff'}}>{it.badge}</span>}
+        </div>
+        <span style={{fontSize:9,fontWeight:active?600:400}}>{it.label}</span>
+        {active&&<span style={{position:'absolute',top:0,left:'50%',transform:'translateX(-50%)',width:20,height:2,borderRadius:2,background:T.accent}}/>}
+      </button>;
+    })}
+  </nav>;
+}
+
+function HomeScreen({artist,setTab}){
+  const cmoReg=Object.values(artist.cmo).filter(c=>c.status==='registered').length;
+  const hasCompass=artist.compass.has&&artist.compass.shared;
+  return <div style={{paddingBottom:80}}>
+    <div style={{padding:'20px 20px 0',marginBottom:20}}>
+      <div style={{fontSize:12,color:T.sub,marginBottom:4}}>Welcome back</div>
+      <div style={{fontSize:24,fontWeight:700,color:T.text,letterSpacing:'-0.5px'}}>{artist.stageName} 👋</div>
+      <div style={{fontSize:12,color:T.sub,marginTop:2}}>{artist.entity} · Managed by Agency 5</div>
+    </div>
+
+    <div style={{margin:'0 16px 14px',background:`linear-gradient(135deg,${T.accent}22,${T.accentD}14)`,border:`1px solid ${T.accentBdr}`,borderRadius:16,padding:'18px 20px'}}>
+      <div style={{fontSize:12,color:T.accentL,marginBottom:6,fontWeight:500}}>Collected to date</div>
+      <div style={{fontSize:34,fontWeight:700,color:T.text,letterSpacing:'-1px',lineHeight:1,marginBottom:artist.financials.pending>0?6:14}}>{fmtR(artist.financials.collected)}</div>
+      {artist.financials.pending>0&&<div style={{fontSize:12,color:T.sub,marginBottom:14}}>+ {fmtR(artist.financials.pending)} pending this period</div>}
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:12,borderTop:'1px solid rgba(255,255,255,0.08)'}}>
+        <div>
+          <div style={{fontSize:10,color:T.sub,marginBottom:2}}>Next remittance</div>
+          <div style={{fontSize:12,fontWeight:500,color:T.text}}>{fmtDate(artist.financials.nextDate)}</div>
+        </div>
+        <button onClick={()=>setTab('money')} style={{fontSize:11,color:T.accent,background:T.accentBg,border:`1px solid ${T.accentBdr}`,borderRadius:8,padding:'5px 12px',cursor:'pointer',fontFamily:'inherit'}}>View details</button>
+      </div>
+    </div>
+
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,margin:'0 16px 14px'}}>
+      <div onClick={()=>setTab('cmo')} style={{background:T.card,border:`1px solid ${T.bdr}`,borderRadius:12,padding:'14px 16px',cursor:'pointer'}}>
+        <div style={{fontSize:22,fontWeight:700,color:T.green,fontFamily:'DM Mono'}}>{cmoReg}<span style={{fontSize:13,color:T.sub,fontWeight:400}}>/4</span></div>
+        <div style={{fontSize:11,color:T.sub,marginTop:2}}>CMOs registered</div>
+      </div>
+      <div onClick={()=>setTab('actions')} style={{background:T.card,border:`1px solid ${artist.actions.length>0?T.red:T.bdr}`,borderRadius:12,padding:'14px 16px',cursor:'pointer'}}>
+        <div style={{fontSize:22,fontWeight:700,color:artist.actions.length>0?T.red:T.sub,fontFamily:'DM Mono'}}>{artist.actions.length}</div>
+        <div style={{fontSize:11,color:T.sub,marginTop:2}}>Actions needed</div>
+      </div>
+    </div>
+
+    {hasCompass&&<div onClick={()=>setTab('compass')} style={{margin:'0 16px 14px',background:T.amberBg,border:`1px solid ${T.amber}40`,borderRadius:12,padding:'14px 16px',cursor:'pointer'}}>
+      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
+        <span style={{fontSize:14,color:T.accent}}>◎</span>
+        <span style={{fontSize:12,fontWeight:600,color:T.accentL}}>Contract Compass — {artist.compass.name}</span>
+      </div>
+      <div style={{fontSize:12,color:T.sub,lineHeight:1.5,marginBottom:6}}>{artist.compass.redFlags} red flags found. Agency 5 has reviewed. Tap to read the full analysis.</div>
+      {artist.compass.autoRenewal&&<div style={{fontSize:11,color:T.amber,fontWeight:500}}>Auto-renewal notice due in {artist.compass.daysLeft} days ({fmtDate(artist.compass.noticeDeadline)})</div>}
+    </div>}
+
+    <div style={{margin:'0 16px'}}>
+      <div style={{display:'flex',justifyContent:'space-between',marginBottom:10}}>
+        <div style={{fontSize:13,fontWeight:600,color:T.text}}>Recent activity</div>
+        <div style={{fontSize:11,color:T.sub}}>Agency 5 updates</div>
+      </div>
+      {artist.activity.slice(0,5).map((a,i)=><div key={i} style={{display:'flex',gap:10,padding:'10px 0',borderBottom:i<4?`1px solid ${T.bdr}`:'none'}}>
+        <Icon type={a.type}/>
+        <div style={{flex:1}}>
+          <div style={{fontSize:12,color:T.text,lineHeight:1.5}}>{a.text}</div>
+          <div style={{fontSize:10,color:T.sub,marginTop:3}}>{ago(a.date)}</div>
+        </div>
+      </div>)}
+    </div>
+  </div>;
+}
+
+function CmoScreen({artist}){
+  const [open,setOpen]=useState(null);
+  return <div style={{padding:'20px 16px 80px'}}>
+    <div style={{marginBottom:20}}>
+      <div style={{fontSize:20,fontWeight:700,color:T.text,marginBottom:4}}>CMO Status</div>
+      <div style={{fontSize:12,color:T.sub}}>Your royalty collection society registrations</div>
+    </div>
+    {Object.entries(artist.cmo).map(([key,cmo])=>{
+      const meta=CMO_META[key];
+      const isOpen=open===key;
+      const isReg=cmo.status==='registered';
+      const isProg=cmo.status==='in_progress';
+      return <div key={key} style={{background:T.card,border:`1px solid ${isReg?T.green+'30':isProg?T.amber+'30':T.bdr}`,borderRadius:12,marginBottom:10,overflow:'hidden'}}>
+        <div onClick={()=>setOpen(isOpen?null:key)} style={{padding:'14px 16px',cursor:'pointer',display:'flex',alignItems:'center',gap:12}}>
+          <div style={{width:38,height:38,borderRadius:10,background:`${meta.color}18`,border:`1px solid ${meta.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,color:meta.color,flexShrink:0}}>{meta.label}</div>
+          <div style={{flex:1}}>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <span style={{fontSize:14,fontWeight:600,color:T.text}}>{meta.label}</span>
+              <Pill status={cmo.status} small/>
+            </div>
+            <div style={{fontSize:11,color:T.sub,marginTop:2}}>{meta.desc}</div>
+          </div>
+          <span style={{fontSize:12,color:T.faint}}>{isOpen?'▲':'▼'}</span>
+        </div>
+        {isOpen&&<div style={{borderTop:`1px solid ${T.bdr}`,padding:'14px 16px',background:T.surf}}>
+          {isReg&&<div>
+            {cmo.memberNum&&<div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:`1px solid ${T.bdr}`,fontSize:12}}><span style={{color:T.sub}}>Member number</span><span style={{color:T.text,fontFamily:'DM Mono'}}>{cmo.memberNum}</span></div>}
+            {cmo.lastCollection&&<div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:`1px solid ${T.bdr}`,fontSize:12}}><span style={{color:T.sub}}>Last collection</span><span style={{color:T.text}}>{cmo.lastCollection}</span></div>}
+            {cmo.lastAmount&&<div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:`1px solid ${T.bdr}`,fontSize:12}}><span style={{color:T.sub}}>Last amount</span><span style={{color:T.green,fontWeight:600}}>{fmtR(cmo.lastAmount)}</span></div>}
+            {cmo.nextExpected&&<div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:12}}><span style={{color:T.sub}}>Next expected</span><span style={{color:T.text}}>{cmo.nextExpected}</span></div>}
+          </div>}
+          {isProg&&cmo.stages&&<div>
+            <div style={{fontSize:11,color:T.amber,marginBottom:10,fontWeight:500}}>Registration in progress — stage {(cmo.stage||1)+1} of {cmo.stages.length}</div>
+            {cmo.stages.map((s,si)=>{
+              const done=si<=(cmo.stage||0);
+              const cur=si===(cmo.stage||0);
+              return <div key={si} style={{display:'flex',alignItems:'center',gap:10,padding:'6px 0',borderBottom:si<cmo.stages.length-1?`1px solid ${T.bdr}`:'none'}}>
+                <div style={{width:20,height:20,borderRadius:'50%',background:done?T.green:T.faint,border:`2px solid ${done?T.green:cur?T.amber:T.faint}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:10,color:done?'#000':T.faint}}>{done?'✓':''}</div>
+                <span style={{fontSize:12,color:done?T.text:T.sub,fontWeight:cur?600:400}}>{s}</span>
+                {cur&&<span style={{fontSize:9,color:T.amber,background:T.amberBg,padding:'1px 6px',borderRadius:10,marginLeft:'auto',fontWeight:600}}>NOW</span>}
+              </div>;
+            })}
+            {cmo.nextExpected&&<div style={{marginTop:10,fontSize:11,color:T.sub}}>{cmo.nextExpected}</div>}
+          </div>}
+          {cmo.status==='not_registered'&&<div style={{fontSize:12,color:T.sub,lineHeight:1.6}}>{cmo.note||'Agency 5 will begin registration as part of your ongoing service.'}</div>}
+        </div>}
+      </div>;
+    })}
+    <div style={{padding:'12px 14px',background:T.surf,border:`1px solid ${T.bdr}`,borderRadius:10,fontSize:11,color:T.sub,lineHeight:1.6,marginTop:6}}>
+      Your CMO registrations are fully managed by Agency 5. You do not need to contact any CMO directly.
+    </div>
+  </div>;
+}
+
+function TracksScreen({artist}){
+  const [open,setOpen]=useState(null);
+  const reg=artist.tracks.filter(t=>t.samro&&t.capasso).length;
+  const part=artist.tracks.filter(t=>(t.samro||t.capasso)&&!(t.samro&&t.capasso)).length;
+  const none=artist.tracks.filter(t=>!t.samro&&!t.capasso).length;
+  return <div style={{padding:'20px 16px 80px'}}>
+    <div style={{marginBottom:14}}>
+      <div style={{fontSize:20,fontWeight:700,color:T.text,marginBottom:4}}>My Catalogue</div>
+      <div style={{fontSize:12,color:T.sub}}>{artist.tracks.length} tracks · {reg} fully registered</div>
+    </div>
+    <div style={{display:'flex',gap:8,marginBottom:14,flexWrap:'wrap'}}>
+      {[{l:'Fully registered',v:reg,c:T.green,bg:T.greenBg},{l:'Partial',v:part,c:T.amber,bg:T.amberBg},{l:'Pending',v:none,c:T.sub,bg:'rgba(255,255,255,0.05)'}].map(s=><span key={s.l} style={{padding:'4px 10px',borderRadius:20,background:s.bg,fontSize:11,fontWeight:500,color:s.c}}>{s.v} {s.l}</span>)}
+    </div>
+    {artist.tracks.map((t,i)=>{
+      const isOpen=open===i;
+      const full=t.samro&&t.capasso;
+      const noReg=!t.samro&&!t.capasso;
+      return <div key={i} style={{background:T.card,border:`1px solid ${full?T.green+'25':noReg?T.bdr:T.amber+'25'}`,borderRadius:12,marginBottom:8,overflow:'hidden'}}>
+        <div onClick={()=>setOpen(isOpen?null:i)} style={{padding:'12px 14px',cursor:'pointer',display:'flex',alignItems:'center',gap:12}}>
+          <div style={{width:34,height:34,borderRadius:8,background:full?T.greenBg:noReg?'rgba(255,255,255,0.04)':T.amberBg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:16,color:full?T.green:noReg?T.faint:T.amber}}>♫</div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:13,fontWeight:500,color:T.text,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{t.title}</div>
+            <div style={{display:'flex',gap:4,marginTop:3,flexWrap:'wrap'}}>
+              {['samro','capasso','sampra'].map(c=><span key={c} style={{fontSize:9,fontWeight:600,padding:'1px 5px',borderRadius:8,textTransform:'uppercase',background:t[c]?`${CMO_META[c].color}18`:'rgba(255,255,255,0.04)',color:t[c]?CMO_META[c].color:T.faint}}>{c}</span>)}
+              {t.split&&<span style={{fontSize:9,fontWeight:600,padding:'1px 5px',borderRadius:8,background:T.greenBg,color:T.green}}>SPLIT ✓</span>}
+            </div>
+          </div>
+          <span style={{fontSize:11,color:T.faint}}>{isOpen?'▲':'▼'}</span>
+        </div>
+        {isOpen&&<div style={{borderTop:`1px solid ${T.bdr}`,padding:'12px 14px',background:T.surf}}>
+          {t.isrc&&<div style={{display:'flex',justifyContent:'space-between',padding:'5px 0',borderBottom:`1px solid ${T.bdr}`,fontSize:11}}><span style={{color:T.sub}}>ISRC</span><span style={{color:T.text,fontFamily:'DM Mono'}}>{t.isrc}</span></div>}
+          {[['SAMRO',t.samro,'Broadcast registered'],['CAPASSO',t.capasso,'Mechanical registered'],['SAMPRA',t.sampra,'Neighbouring rights'],['Split sheet',t.split,'Splits confirmed']].map(([l,v,desc])=><div key={l} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 0',borderBottom:`1px solid ${T.bdr}`,fontSize:12}}>
+            <div><div style={{color:T.text,fontWeight:500}}>{l}</div><div style={{fontSize:10,color:T.sub}}>{v?desc:'Pending'}</div></div>
+            <span style={{fontSize:10,fontWeight:600,color:v?T.green:T.sub,background:v?T.greenBg:'rgba(255,255,255,0.04)',padding:'2px 8px',borderRadius:20}}>{v?'✓':'Pending'}</span>
+          </div>)}
+          {!t.split&&<div style={{marginTop:8,fontSize:11,color:T.amber,background:T.amberBg,padding:'7px 10px',borderRadius:7}}>Split sheet not yet confirmed. Contact Agency 5 for changes to composition credits.</div>}
+        </div>}
+      </div>;
+    })}
+  </div>;
+}
+
+function MoneyScreen({artist}){
+  const [sub,setSub]=useState('balance');
+  const f=artist.financials;
+
+  function statusColor(s){return s==='remitted'?T.green:s==='dispute'||s==='missing'?T.red:T.amber;}
+  function statusBg(s){return s==='remitted'?T.greenBg:s==='dispute'||s==='missing'?T.redBg:T.amberBg;}
+  function statusLabel(s){return s==='remitted'?'Done':s==='pending'?'Pending':s==='dispute'?'Dispute':'Missing';}
+
+  return <div style={{paddingBottom:80}}>
+    <div style={{padding:'20px 16px 0',marginBottom:14}}>
+      <div style={{fontSize:20,fontWeight:700,color:T.text,marginBottom:4}}>Financials</div>
+      <div style={{fontSize:12,color:T.sub}}>Collections, remittances and statements</div>
+    </div>
+    <div style={{display:'flex',padding:'0 16px',gap:6,marginBottom:14,overflowX:'auto'}}>
+      {[['balance','Balance'],['breakdown','Breakdown'],['remittances','Remittances'],['statements','Statements']].map(([id,l])=><button key={id} onClick={()=>setSub(id)} style={{padding:'6px 14px',borderRadius:20,border:`1px solid ${sub===id?T.accent:T.bdrM}`,background:sub===id?T.accentBg:'transparent',color:sub===id?T.accentL:T.sub,cursor:'pointer',fontSize:12,fontWeight:sub===id?500:400,fontFamily:'inherit',whiteSpace:'nowrap'}}>{l}</button>)}
+    </div>
+
+    {sub==='balance'&&<div style={{padding:'0 16px'}}>
+      <div style={{background:`linear-gradient(135deg,${T.accent}18,${T.accentD}10)`,border:`1px solid ${T.accentBdr}`,borderRadius:14,padding:'20px',marginBottom:12}}>
+        <div style={{fontSize:11,color:T.accentL,marginBottom:8,textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:600}}>Current balance</div>
+        <div style={{fontSize:38,fontWeight:700,color:T.text,letterSpacing:'-1.5px',lineHeight:1}}>{fmtR(f.collected)}</div>
+        <div style={{display:'flex',gap:16,marginTop:14,paddingTop:12,borderTop:'1px solid rgba(255,255,255,0.07)'}}>
+          <div><div style={{fontSize:10,color:T.sub,marginBottom:2}}>Collected (net)</div><div style={{fontSize:14,fontWeight:600,color:T.green}}>{fmtR(f.collected)}</div></div>
+          <div><div style={{fontSize:10,color:T.sub,marginBottom:2}}>Pending</div><div style={{fontSize:14,fontWeight:600,color:T.amber}}>{fmtR(f.pending)}</div></div>
+        </div>
+      </div>
+      <div style={{background:T.card,border:`1px solid ${T.bdr}`,borderRadius:12,padding:'14px 16px',marginBottom:10}}>
+        <div style={{fontSize:11,color:T.sub,marginBottom:8,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.06em'}}>Next remittance</div>
+        <div style={{fontSize:14,fontWeight:600,color:T.text}}>{fmtDate(f.nextDate)}</div>
+        <div style={{fontSize:11,color:T.sub,marginTop:3}}>Agency 5 remits quarterly, net of 20% commission</div>
+      </div>
+      <div style={{padding:'10px 12px',background:T.surf,border:`1px solid ${T.bdr}`,borderRadius:10,fontSize:11,color:T.sub,lineHeight:1.6}}>
+        Agency 5 retains a 20% administration commission on all CMO collections. All collections and deductions are detailed in your quarterly statements.
+      </div>
+    </div>}
+
+    {sub==='breakdown'&&<div style={{padding:'0 16px'}}>
+      <div style={{fontSize:11,fontWeight:600,color:T.sub,textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:10}}>CMO Collections</div>
+      {f.cmoHistory.map((src,si)=>{
+        const col={capasso:T.capasso,samro:T.samro,sampra:T.sampra,airco:T.accentL}[src.cmo]||T.accent;
+        const meta=CMO_META[src.cmo]||{label:src.cmo.toUpperCase(),desc:''};
+        const total=src.entries.filter(e=>e.gross).reduce((a,e)=>a+e.gross,0);
+        return <div key={si} style={{background:T.card,border:`1px solid ${col}28`,borderRadius:12,padding:'14px 16px',marginBottom:10}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+            <div style={{display:'flex',alignItems:'center',gap:10}}>
+              <div style={{width:34,height:34,borderRadius:8,background:`${col}18`,border:`1px solid ${col}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:9,fontWeight:700,color:col,flexShrink:0}}>{meta.label}</div>
+              <div>
+                <div style={{fontSize:13,fontWeight:600,color:T.text}}>{meta.label}</div>
+                <div style={{fontSize:10,color:T.sub}}>{src.scheduleNote}</div>
+              </div>
+            </div>
+            <span style={{fontSize:9,fontWeight:600,color:col,background:`${col}18`,padding:'2px 8px',borderRadius:20,flexShrink:0}}>{src.schedule}</span>
+          </div>
+          {src.entries.length>0?<div style={{borderTop:`1px solid ${T.bdr}`,paddingTop:8}}>
+            {src.entries.map((e,ei)=><div key={ei} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'5px 0',borderBottom:ei<src.entries.length-1?`1px solid ${T.bdr}`:'none',fontSize:11}}>
+              <span style={{color:T.sub}}>{e.period}</span>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                {e.gross?<span style={{color:T.text,fontFamily:'DM Mono',fontWeight:500}}>{fmtR(e.gross)}</span>:<span style={{color:T.sub,fontFamily:'DM Mono'}}>—</span>}
+                <span style={{fontSize:9,fontWeight:600,color:statusColor(e.status),background:statusBg(e.status),padding:'1px 6px',borderRadius:10}}>{statusLabel(e.status)}</span>
+              </div>
+            </div>)}
+            {total>0&&<div style={{marginTop:8,paddingTop:8,borderTop:`1px solid ${T.bdr}`,fontSize:11,color:T.sub}}>Gross collected: <span style={{color:T.green,fontWeight:600,fontFamily:'DM Mono'}}>{fmtR(total)}</span></div>}
+          </div>:<div style={{borderTop:`1px solid ${T.bdr}`,paddingTop:8,fontSize:11,color:T.sub,lineHeight:1.5}}>No collections yet.</div>}
+          <div style={{marginTop:6,fontSize:10,color:T.faint}}>Next: {src.nextExpected}</div>
+        </div>;
+      })}
+
+      <div style={{fontSize:11,fontWeight:600,color:T.sub,textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:10,marginTop:4}}>Distributor Income</div>
+      {f.dspHistory.map((src,si)=>{
+        const col=src.type==='crbt'?T.accentL:T.blue;
+        return <div key={si} style={{background:T.card,border:`1px solid ${col}28`,borderRadius:12,padding:'14px 16px',marginBottom:10}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+            <div>
+              <div style={{fontSize:13,fontWeight:600,color:T.text}}>{src.source}</div>
+              <div style={{fontSize:10,color:T.sub}}>{src.scheduleNote}</div>
+            </div>
+            <span style={{fontSize:9,fontWeight:600,color:col,background:`${col}18`,padding:'2px 8px',borderRadius:20,flexShrink:0}}>{src.schedule}</span>
+          </div>
+          {src.entries.length>0&&<div style={{borderTop:`1px solid ${T.bdr}`,paddingTop:8}}>
+            {src.entries.map((e,ei)=><div key={ei} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 0',borderBottom:ei<src.entries.length-1?`1px solid ${T.bdr}`:'none',fontSize:11}}>
+              <div style={{flex:1,paddingRight:8}}>
+                <div style={{color:T.sub}}>{e.period}</div>
+                {e.note&&<div style={{fontSize:10,color:T.red,marginTop:2}}>{e.note}</div>}
+              </div>
+              <div style={{display:'flex',alignItems:'center',gap:6,flexShrink:0}}>
+                {e.gross?<span style={{color:T.text,fontFamily:'DM Mono',fontWeight:500}}>{fmtR(e.gross)}</span>:<span style={{color:T.sub,fontFamily:'DM Mono'}}>—</span>}
+                <span style={{fontSize:9,fontWeight:600,color:statusColor(e.status),background:statusBg(e.status),padding:'1px 6px',borderRadius:10}}>{statusLabel(e.status)}</span>
+              </div>
+            </div>)}
+          </div>}
+          {src.note&&<div style={{marginTop:8,paddingTop:src.entries.length>0?8:0,borderTop:src.entries.length>0?`1px solid ${T.bdr}`:'none',fontSize:11,color:T.sub,lineHeight:1.5}}>{src.note}</div>}
+          <div style={{marginTop:6,fontSize:10,color:T.faint}}>Next: {src.nextExpected}</div>
+        </div>;
+      })}
+
+      <div style={{padding:'12px 14px',background:T.surf,border:`1px solid ${T.accentBdr}`,borderRadius:10,fontSize:11,color:T.sub,lineHeight:1.7,marginTop:4}}>
+        <div style={{fontWeight:600,color:T.text,marginBottom:8,fontSize:12}}>How your income flows</div>
+        <div style={{marginBottom:6,display:'flex',gap:8}}><span>🎵</span><span><strong style={{color:T.text}}>DSP streams</strong> (Spotify, Apple Music, YouTube) generate two separate royalty streams — master income via your distributor, <em>and</em> publishing royalties collected by CAPASSO.</span></div>
+        <div style={{marginBottom:6,display:'flex',gap:8}}><span>📱</span><span><strong style={{color:T.text}}>CRBT / RBT</strong> ringtone and ringback downloads generate AIRCO income — tracked quarterly once you are registered. MTN income is already being estimated.</span></div>
+        <div style={{display:'flex',gap:8}}><span>📻</span><span><strong style={{color:T.text}}>Radio & broadcast</strong> airplay feeds SAMRO (performance royalties) and CAPASSO (publishing royalties) simultaneously.</span></div>
+      </div>
+    </div>}
+
+    {sub==='remittances'&&<div style={{padding:'0 16px'}}>
+      <div style={{fontSize:11,color:T.sub,marginBottom:12}}>Payments made to you by Agency 5</div>
+      {f.remittances.map(r=><div key={r.id} style={{background:T.card,border:`1px solid ${T.bdr}`,borderRadius:12,padding:'14px 16px',marginBottom:8,display:'flex',alignItems:'center',gap:12}}>
+        <div style={{width:36,height:36,borderRadius:10,background:T.greenBg,display:'flex',alignItems:'center',justifyContent:'center',color:T.green,fontSize:16,flexShrink:0}}>✓</div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:13,fontWeight:600,color:T.text}}>{fmtR(r.amount)}</div>
+          <div style={{fontSize:11,color:T.sub,marginTop:1}}>{r.source}</div>
+        </div>
+        <div style={{textAlign:'right'}}>
+          <div style={{fontSize:11,color:T.sub}}>{fmtDate(r.date)}</div>
+          <span style={{fontSize:10,fontWeight:600,color:T.green,background:T.greenBg,padding:'1px 7px',borderRadius:20}}>Paid</span>
+        </div>
+      </div>)}
+      <div style={{marginTop:4,padding:'10px 12px',background:T.surf,border:`1px solid ${T.bdr}`,borderRadius:10,fontSize:11,color:T.sub,lineHeight:1.6}}>
+        These are net amounts after 20% commission. Tap Breakdown to see the gross CMO collections behind each remittance.
+      </div>
+    </div>}
+
+    {sub==='statements'&&<div style={{padding:'0 16px'}}>
+      {f.statements.map(s=>{
+        const flag=s.status.includes('flag')||s.status.includes('Missing');
+        const ok=s.status==='Reviewed';
+        return <div key={s.id} style={{background:T.card,border:`1px solid ${flag?T.red+'30':ok?T.bdr:T.amber+'30'}`,borderRadius:12,padding:'14px 16px',marginBottom:8}}>
+          <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:10}}>
+            <div>
+              <div style={{fontSize:13,fontWeight:500,color:T.text}}>{s.source} — {s.period}</div>
+              <div style={{fontSize:11,color:T.sub,marginTop:2}}>{s.type}</div>
+            </div>
+            <span style={{fontSize:10,fontWeight:600,padding:'2px 8px',borderRadius:20,flexShrink:0,color:flag?T.red:ok?T.green:T.amber,background:flag?T.redBg:ok?T.greenBg:T.amberBg,whiteSpace:'nowrap'}}>{s.status}</span>
+          </div>
+          {s.flag&&<div style={{marginTop:8,fontSize:11,color:T.red,background:T.redBg,padding:'6px 10px',borderRadius:7}}>⚠ {s.flag}. Agency 5 is investigating.</div>}
+        </div>;
+      })}
+      <div style={{padding:'10px 12px',background:T.surf,border:`1px solid ${T.bdr}`,borderRadius:10,fontSize:11,color:T.sub,lineHeight:1.6,marginTop:4}}>
+        For any questions about a specific statement, message your consultant directly.
+      </div>
+    </div>}
+  </div>;
+}
+
+function ActionsScreen({artist}){
+  if(artist.actions.length===0) return <div style={{padding:'20px 16px 80px',textAlign:'center'}}>
+    <div style={{padding:'60px 20px',color:T.sub}}>
+      <div style={{fontSize:40,marginBottom:12}}>✅</div>
+      <div style={{fontSize:15,fontWeight:500,color:T.text,marginBottom:6}}>All up to date</div>
+      <div style={{fontSize:13}}>No actions needed right now. Agency 5 will notify you when your input is required.</div>
+    </div>
+  </div>;
+  return <div style={{padding:'20px 16px 80px'}}>
+    <div style={{marginBottom:14}}>
+      <div style={{fontSize:20,fontWeight:700,color:T.text,marginBottom:4}}>Actions Required</div>
+      <div style={{fontSize:12,color:T.sub}}>{artist.actions.length} items need your attention</div>
+    </div>
+    {artist.actions.map(a=><div key={a.id} style={{background:T.card,border:`1px solid ${a.urgency==='red'?T.red+'40':T.amber+'30'}`,borderRadius:12,padding:'14px 16px',marginBottom:10}}>
+      <div style={{display:'flex',gap:10,marginBottom:8}}>
+        <div style={{width:32,height:32,borderRadius:8,background:a.urgency==='red'?T.redBg:T.amberBg,display:'flex',alignItems:'center',justifyContent:'center',color:a.urgency==='red'?T.red:T.amber,fontSize:16,flexShrink:0}}>{a.urgency==='red'?'!':'○'}</div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:13,fontWeight:600,color:T.text,lineHeight:1.4}}>{a.title}</div>
+          <div style={{fontSize:10,color:T.sub,marginTop:2}}>{fmtDate(a.date)}</div>
+        </div>
+        <span style={{fontSize:9,fontWeight:700,color:a.urgency==='red'?T.red:T.amber,background:a.urgency==='red'?T.redBg:T.amberBg,padding:'2px 7px',borderRadius:20,height:'fit-content',textTransform:'uppercase',flexShrink:0}}>{a.urgency==='red'?'Urgent':'Action'}</span>
+      </div>
+      <div style={{fontSize:12,color:T.sub,lineHeight:1.6,marginBottom:10}}>{a.detail}</div>
+      <div style={{padding:'8px 12px',background:T.surf,borderRadius:8,fontSize:11,color:T.accentL}}>✉ Contact Agency 5 — Jerome will guide you through this</div>
+    </div>)}
+  </div>;
+}
+
+function CompassScreen({artist}){
+  const c=artist.compass;
+  if(!c.has||!c.shared) return <div style={{padding:'20px 16px 80px',textAlign:'center'}}>
+    <div style={{padding:'60px 20px',color:T.sub}}>
+      <div style={{fontSize:40,marginBottom:12}}>◎</div>
+      <div style={{fontSize:15,fontWeight:500,color:T.text,marginBottom:8}}>No analysis available yet</div>
+      <div style={{fontSize:13,lineHeight:1.6}}>Agency 5 will analyse your agreements and share key insights here once reviewed.</div>
+    </div>
+  </div>;
+  const scoreColor=c.score>=7?T.green:c.score>=4?T.amber:T.red;
+  return <div style={{padding:'20px 16px 80px'}}>
+    <div style={{marginBottom:14}}>
+      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
+        <span style={{color:T.accent,fontSize:16}}>◎</span>
+        <div style={{fontSize:20,fontWeight:700,color:T.text}}>Contract Compass</div>
+      </div>
+      <div style={{fontSize:12,color:T.sub}}>Your agreements, explained by Agency 5</div>
+    </div>
+    <div style={{background:T.card,border:`1px solid ${T.accentBdr}`,borderRadius:14,padding:'18px',marginBottom:14}}>
+      <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:12,gap:12}}>
+        <div style={{flex:1}}>
+          <div style={{fontSize:14,fontWeight:600,color:T.text,marginBottom:4}}>{c.name}</div>
+          <div style={{fontSize:12,color:T.sub,lineHeight:1.5}}>{c.assessment}</div>
+        </div>
+        <div style={{textAlign:'center',flexShrink:0}}>
+          <div style={{fontSize:28,fontWeight:700,color:scoreColor,fontFamily:'DM Mono',lineHeight:1}}>{c.score}</div>
+          <div style={{fontSize:9,color:T.sub,textTransform:'uppercase',letterSpacing:'0.08em',marginTop:2}}>out of 10</div>
+        </div>
+      </div>
+      <div style={{display:'flex',gap:8}}>
+        <span style={{fontSize:11,color:T.red,background:T.redBg,padding:'3px 10px',borderRadius:20,fontWeight:500}}>⚠ {c.redFlags} red flags</span>
+        <span style={{fontSize:11,color:T.amber,background:T.amberBg,padding:'3px 10px',borderRadius:20,fontWeight:500}}>{c.amberFlags} to watch</span>
+      </div>
+    </div>
+    {c.autoRenewal&&<div style={{background:T.amberBg,border:`1px solid ${T.amber}40`,borderRadius:12,padding:'14px 16px',marginBottom:14}}>
+      <div style={{fontSize:12,fontWeight:600,color:T.amber,marginBottom:6}}>⚠ Auto-renewal alert</div>
+      <div style={{fontSize:12,color:T.sub,lineHeight:1.5,marginBottom:6}}>This agreement automatically renews unless written notice is given before {fmtDate(c.noticeDeadline)} — that is {c.daysLeft} days away.</div>
+      <div style={{fontSize:11,color:T.amber,background:'rgba(240,168,64,0.08)',padding:'7px 10px',borderRadius:8}}>Agency 5 is monitoring this deadline and will contact you before the window closes.</div>
+    </div>}
+    <div style={{background:T.card,border:`1px solid ${T.bdr}`,borderRadius:12,padding:'14px 16px',marginBottom:14}}>
+      <div style={{fontSize:12,fontWeight:600,color:T.text,marginBottom:10}}>What does this mean for you?</div>
+      {[
+        {ico:'🔴',txt:'Your agreement has clauses that significantly favour the distributor. Agency 5 has flagged these and will use them in any future renegotiation.'},
+        {ico:'📅',txt:'The auto-renewal clause is the most immediate concern. Agency 5 is tracking the deadline for you.'},
+        {ico:'✅',txt:'You do not need to take any action right now. Agency 5 will advise you before any critical deadline.'},
+      ].map((p,i)=><div key={i} style={{display:'flex',gap:10,padding:'8px 0',borderBottom:i<2?`1px solid ${T.bdr}`:'none'}}>
+        <span style={{fontSize:16,flexShrink:0}}>{p.ico}</span>
+        <span style={{fontSize:12,color:T.sub,lineHeight:1.5}}>{p.txt}</span>
+      </div>)}
+    </div>
+    <div style={{padding:'10px 12px',background:T.surf,border:`1px solid ${T.bdr}`,borderRadius:10,fontSize:10,color:T.faint,lineHeight:1.6}}>
+      ⚖ This analysis is for educational purposes only and is not legal advice. It does not constitute legal representation. Consult a qualified entertainment attorney for advice specific to your situation.
+    </div>
+  </div>;
+}
+
+function MessagesScreen({artist}){
+  const [msgs,setMsgs]=useState(artist.messages);
+  const [input,setInput]=useState('');
+  const endRef=useRef(null);
+
+  useEffect(()=>{
+    if(endRef.current) endRef.current.scrollIntoView({behavior:'smooth'});
+  },[msgs]);
+
+  function send(){
+    if(!input.trim())return;
+    setMsgs(prev=>[...prev,{id:'n'+Date.now(),from:artist.stageName,initials:artist.initials,color:artist.color,text:input.trim(),date:new Date().toISOString(),fromConsultant:false}]);
+    setInput('');
+  }
+
+  return <div style={{display:'flex',flexDirection:'column',height:'calc(100vh - 56px)'}}>
+    <div style={{padding:'14px 16px 12px',borderBottom:`1px solid ${T.bdr}`,flexShrink:0,display:'flex',alignItems:'center',gap:10}}>
+      <div style={{width:36,height:36,borderRadius:10,background:'#C9951A',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,color:'#fff'}}>JL</div>
+      <div>
+        <div style={{fontSize:13,fontWeight:600,color:T.text}}>{artist.consultant}</div>
+        <div style={{fontSize:11,color:T.green}}>● Agency 5</div>
+      </div>
+    </div>
+    <div style={{flex:1,overflowY:'auto',padding:'14px 16px'}}>
+      {msgs.map(m=>{
+        const isC=m.fromConsultant;
+        return <div key={m.id} style={{display:'flex',gap:8,marginBottom:14,flexDirection:isC?'row':'row-reverse'}}>
+          <Av initials={m.initials} color={m.color} size={30}/>
+          <div style={{maxWidth:'78%'}}>
+            <div style={{fontSize:10,color:T.sub,marginBottom:3,textAlign:isC?'left':'right'}}>{m.from} · {ago(m.date)}</div>
+            <div style={{background:isC?T.card:`linear-gradient(135deg,${T.accent},${T.accentD})`,borderRadius:isC?'4px 12px 12px 12px':'12px 4px 12px 12px',padding:'10px 12px',fontSize:12,color:T.text,lineHeight:1.6,border:isC?`1px solid ${T.bdr}`:'none'}}>{m.text}</div>
+          </div>
+        </div>;
+      })}
+      <div ref={endRef}/>
+    </div>
+    <div style={{padding:'10px 12px',borderTop:`1px solid ${T.bdr}`,display:'flex',gap:8,flexShrink:0,background:T.surf,paddingBottom:16}}>
+      <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()} placeholder="Message Agency 5..." style={{flex:1,padding:'10px 14px',background:T.card,border:`1px solid ${T.bdrM}`,borderRadius:24,color:T.text,outline:'none',fontSize:13,fontFamily:'inherit'}}/>
+      <button onClick={send} disabled={!input.trim()} style={{width:40,height:40,borderRadius:'50%',background:input.trim()?`linear-gradient(135deg,${T.accent},${T.accentD})`:'rgba(255,255,255,0.05)',border:'none',cursor:input.trim()?'pointer':'default',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:16,color:input.trim()?'#fff':T.faint}}>➤</button>
+    </div>
+  </div>;
+}
+
+function ProfileScreen({artist,onLogout}){
+  return <div style={{padding:'20px 16px 80px'}}>
+    <div style={{background:`linear-gradient(135deg,${T.accent}18,${T.accentD}10)`,border:`1px solid ${T.accentBdr}`,borderRadius:16,padding:'20px',marginBottom:20,textAlign:'center'}}>
+      <Av initials={artist.initials} color={artist.color} size={64}/>
+      <div style={{fontSize:20,fontWeight:700,color:T.text,marginTop:10}}>{artist.stageName}</div>
+      <div style={{fontSize:12,color:T.sub,marginTop:2}}>{artist.legalName}</div>
+      <div style={{display:'inline-flex',gap:6,marginTop:10}}>
+        <span style={{fontSize:11,fontWeight:600,color:T.accentL,background:T.accentBg,padding:'3px 10px',borderRadius:20,border:`1px solid ${T.accentBdr}`}}>{artist.plan} Plan</span>
+        <span style={{fontSize:11,color:T.sub,background:'rgba(255,255,255,0.05)',padding:'3px 10px',borderRadius:20}}>Agency 5</span>
+      </div>
+    </div>
+    {[{l:'Entity',v:artist.entity},{l:'Distributor',v:artist.distributor},{l:'Consultant',v:artist.consultant},{l:'Portal email',v:artist.email}].map(row=><div key={row.l} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'13px 0',borderBottom:`1px solid ${T.bdr}`,fontSize:13}}>
+      <span style={{color:T.sub}}>{row.l}</span>
+      <span style={{color:T.text,textAlign:'right',maxWidth:'60%'}}>{row.v}</span>
+    </div>)}
+    <div style={{marginTop:20}}>
+      {['My plan & commission','Need help?','Privacy & data','Contact Agency 5'].map(label=><div key={label} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 0',borderBottom:`1px solid ${T.bdr}`,cursor:'pointer'}}>
+        <span style={{fontSize:13,color:T.text}}>{label}</span>
+        <span style={{color:T.faint}}>›</span>
+      </div>)}
+    </div>
+    <button onClick={onLogout} style={{width:'100%',marginTop:24,padding:13,borderRadius:10,border:`1px solid ${T.bdrM}`,background:'transparent',color:T.sub,fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>Sign out</button>
+    <div style={{textAlign:'center',marginTop:16,fontSize:10,color:T.faint,lineHeight:1.6}}>
+      Soundclaim Artist Portal v1.0<br/>Agency 5 (Pty) Ltd<br/>172 Endwell Street, Winchester Hills, Johannesburg
+    </div>
+  </div>;
+}
+
+function App(){
+  const [artist,setArtist]=useState(null);
+  const [tab,setTab]=useState('home');
+
+  if(!artist) return <LoginScreen onLogin={a=>{setArtist(a);setTab('home');}}/>;
+
+  const titles={home:'',cmo:'CMO Status',tracks:'My Catalogue',money:'Financials',actions:'Actions',compass:'Contract Compass',messages:'Messages',profile:'Settings'};
+  const screens={
+    home:<HomeScreen artist={artist} setTab={setTab}/>,
+    cmo:<CmoScreen artist={artist}/>,
+    tracks:<TracksScreen artist={artist}/>,
+    money:<MoneyScreen artist={artist}/>,
+    actions:<ActionsScreen artist={artist}/>,
+    compass:<CompassScreen artist={artist}/>,
+    messages:<MessagesScreen artist={artist}/>,
+    profile:<ProfileScreen artist={artist} onLogout={()=>{setArtist(null);setTab('home');}}/>,
+  };
+
+  return <div style={{background:T.bg,minHeight:'100vh',maxWidth:430,margin:'0 auto',position:'relative',overflowX:'hidden'}}>
+    {tab!=='home'&&tab!=='messages'&&<div style={{padding:'14px 16px 12px',borderBottom:`1px solid ${T.bdr}`,display:'flex',alignItems:'center',justifyContent:'space-between',background:T.surf,position:'sticky',top:0,zIndex:50}}>
+      <div style={{display:'flex',alignItems:'center',gap:10}}>
+        <div style={{width:26,height:26,borderRadius:7,background:`linear-gradient(135deg,${T.accent},${T.accentD})`,display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:12}}>★</div>
+        <span style={{fontSize:14,fontWeight:600,color:T.text}}>{titles[tab]}</span>
+      </div>
+      <div onClick={()=>setTab('profile')} style={{cursor:'pointer'}}><Av initials={artist.initials} color={artist.color} size={32}/></div>
+    </div>}
+    {tab==='home'&&<div style={{padding:'14px 16px 10px',display:'flex',alignItems:'center',justifyContent:'space-between',background:T.bg,position:'sticky',top:0,zIndex:50}}>
+      <div style={{display:'flex',alignItems:'center',gap:8}}>
+        <div style={{width:28,height:28,borderRadius:8,background:`linear-gradient(135deg,${T.accent},${T.accentD})`,display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:13}}>★</div>
+        <div><div style={{fontSize:12,fontWeight:600,color:T.text}}>Soundclaim</div><div style={{fontSize:9,color:T.sub,letterSpacing:'0.1em',textTransform:'uppercase'}}>Artist Portal</div></div>
+      </div>
+      <div onClick={()=>setTab('profile')} style={{cursor:'pointer'}}><Av initials={artist.initials} color={artist.color} size={32}/></div>
+    </div>}
+    <div className="fade-up">{screens[tab]||screens.home}</div>
+    <BottomNav tab={tab} setTab={setTab} redCount={artist.actions.filter(a=>a.urgency==='red').length}/>
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
