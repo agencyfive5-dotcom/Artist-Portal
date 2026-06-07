@@ -18,3 +18,4 @@ Single-file React app (`index.html`) — no build step required. Runs in any mod
 ## Related
 
 - [Royalty-Pro](https://github.com/agencyfive5-dotcom/Royalty-Pro) — back-office royalty intelligence tool
+feat: add CRBT Income tab to Financials — reads verified data from SoundClaim
