@@ -74,27 +74,27 @@ const ARTISTS=[
       ],
       cmoHistory:[
         {cmo:'capasso',schedule:'Bi-annual',scheduleNote:'Pays in Jan & Jul',nextExpected:'Jul 2026',entries:[
-          {period:'Q3 2025',gross:67750,date:'2025-10-31',status:'remitted'},
-          {period:'Q1 2025',gross:42500,date:'2025-04-30',status:'remitted'},
-          {period:'Q3 2024',gross:55000,date:'2024-10-31',status:'remitted'},
+          {period:'Q3 2025',gross:67750,status:'remitted'},
+          {period:'Q1 2025',gross:42500,status:'remitted'},
+          {period:'Q3 2024',gross:55000,status:'remitted'},
         ]},
         {cmo:'samro',schedule:'Quarterly',scheduleNote:'Mar, Jun, Sep, Dec',nextExpected:'Sep 2026',entries:[
-          {period:'Q2 2025',gross:18250,date:'2025-09-01',status:'remitted'},
-          {period:'Q4 2024',gross:30250,date:'2025-03-01',status:'remitted'},
-          {period:'Q2 2024',gross:28400,date:'2024-09-01',status:'pending'},
+          {period:'Q2 2025',gross:18250,status:'remitted'},
+          {period:'Q4 2024',gross:30250,status:'remitted'},
+          {period:'Q2 2024',gross:28400,status:'pending'},
         ]},
         {cmo:'sampra',schedule:'Annual',scheduleNote:'Jul each year',nextExpected:'Jul 2027 est. — pending registration',entries:[]},
         {cmo:'airco',schedule:'Quarterly',scheduleNote:'Quarterly when registered',nextExpected:'TBD — not yet registered',entries:[]},
       ],
       dspHistory:[
         {source:'Electromode (DSP)',type:'dsp',schedule:'Monthly',scheduleNote:'Streams: Spotify, Apple Music, YouTube Music etc.',nextExpected:'Ongoing monthly',entries:[
-          {period:'Q4 2025',gross:38400,date:'2026-01-30',status:'pending'},
-          {period:'Jan 2024',gross:null,date:'2024-03-15',status:'dispute',note:'R36,629 debit balance — unexplained by distributor'},
-          {period:'Q3 2022',gross:null,date:null,status:'missing'},
+          {period:'Q4 2025',gross:38400,status:'pending'},
+          {period:'Jan 2024',gross:null,status:'dispute',note:'R36,629 debit balance — unexplained by distributor'},
+          {period:'Q3 2022',gross:null,status:'missing'},
         ]},
-        {source:'CRBT via MTN (Electromode)',type:'crbt',schedule:'Quarterly',scheduleNote:'Ringtone & ringback tone downloads',nextExpected:'Q1 2026 est.',entries:[
-          {period:'Q3 2025',gross:8200,date:'2025-10-30',status:'pending'},
-        ],note:'Est. R18k–R35k/year from MTN alone. Feeds AIRCO income once registered.'},
+        {source:'CRBT via MTN (Electromode)',type:'crbt',schedule:'Quarterly',scheduleNote:'Ringtone & ringback tone downloads',nextExpected:'Q1 2026 est.',note:'Est. R18k–R35k/year from MTN alone. Feeds AIRCO income once registered.',entries:[
+          {period:'Q3 2025',gross:8200,status:'pending'},
+        ]},
       ],
     },
     actions:[
@@ -116,6 +116,14 @@ const ARTISTS=[
       assessment:'This agreement has several clauses that significantly favour the distributor over the artist. The auto-renewal provision and broad cross-collateralisation clause are the most concerning.',
       redFlags:3,amberFlags:4,autoRenewal:true,noticeDeadline:'2026-09-15',daysLeft:128,
     },
+    splitSheets:[
+      {id:'sp1',trackTitle:'VSOP feat. Reece Madlisa',status:'submitted',dateSubmitted:'2026-04-10',totalPub:100,totalMaster:0,
+        contributors:[
+          {name:'Busta 929',role:'Composer / Songwriter',pub:'45',master:'50',ipi:'',contact:''},
+          {name:'Reece Madlisa',role:'Featured Artist',pub:'35',master:'40',ipi:'',contact:''},
+          {name:'Mzu M',role:'Producer',pub:'20',master:'10',ipi:'',contact:''},
+        ]},
+    ],
     messages:[
       {id:'m1',from:'Jerome',initials:'JL',color:'#C9951A',text:'Hi Thapelo — the SAMPRA registration is now in progress. We submitted all documents on 3 May. You should expect confirmation within 8 to 12 weeks. Once registered, we will start tracking your neighbouring rights income.',date:'2026-05-04',fromConsultant:true},
       {id:'m2',from:'Busta 929',initials:'B9',color:'#1A5FA3',text:'Thanks Jerome. What about the Electromode situation — any response from them on the R36k?',date:'2026-05-05',fromConsultant:false},
@@ -147,18 +155,19 @@ const ARTISTS=[
       ],
       cmoHistory:[
         {cmo:'capasso',schedule:'Bi-annual',scheduleNote:'Pays in Jan & Jul',nextExpected:'Jul 2026',entries:[
-          {period:'Q3 2025',gross:18400,date:'2025-10-31',status:'remitted'},
+          {period:'Q3 2025',gross:18400,status:'remitted'},
+          {period:'Q1 2025',gross:14200,status:'remitted'},
         ]},
-        {cmo:'samro',schedule:'Quarterly',scheduleNote:'Mar, Jun, Sep, Dec',nextExpected:'Pending registration',entries:[]},
-        {cmo:'sampra',schedule:'Annual',scheduleNote:'Jul each year',nextExpected:'TBD — pending SAMRO completion',entries:[]},
-        {cmo:'airco',schedule:'Quarterly',scheduleNote:'Quarterly when registered',nextExpected:'TBD — not yet assessed',entries:[]},
+        {cmo:'samro',schedule:'Quarterly',scheduleNote:'Mar, Jun, Sep, Dec',nextExpected:'Sep 2026',entries:[]},
+        {cmo:'sampra',schedule:'Annual',scheduleNote:'Jul each year',nextExpected:'TBD — setup required after SAMRO',entries:[]},
+        {cmo:'airco',schedule:'Quarterly',scheduleNote:'Quarterly when registered',nextExpected:'TBD — pending SAMPRA first',entries:[]},
       ],
       dspHistory:[
-        {source:'Piano Hub (Kabza)',type:'dsp',schedule:'Bi-annual',scheduleNote:'Streams on digital platforms',nextExpected:'Overdue — formal notice issued',entries:[
-          {period:'Nov 2024',gross:null,date:null,status:'missing'},
-          {period:'May 2024',gross:null,date:null,status:'missing'},
-          {period:'Nov 2023',gross:null,date:null,status:'missing'},
-        ],note:'3 consecutive periods missing. Agency 5 has issued formal notice to Piano Hub.'},
+        {source:'Piano Hub (DSP)',type:'dsp',schedule:'Semi-annual',scheduleNote:'Streams via Piano Hub / Kabza network',nextExpected:'Q3 2026',entries:[
+          {period:'Nov 2024',gross:null,status:'missing',note:'Formal notice sent by Agency 5'},
+          {period:'May 2024',gross:null,status:'missing',note:'Formal notice sent by Agency 5'},
+          {period:'Nov 2023',gross:null,status:'missing',note:'Formal notice sent by Agency 5'},
+        ]},
       ],
     },
     actions:[
@@ -171,6 +180,7 @@ const ARTISTS=[
       {date:'2026-01-15',text:'Remittance of R14,720 processed — CAPASSO Q3 2025 net of commission.',type:'payment'},
     ],
     compass:{has:false,shared:false},
+    splitSheets:[],
     messages:[
       {id:'m1',from:'Jerome',initials:'JL',color:'#C9951A',text:'Hi Njabulo — SAMRO is now in the final review stage. We expect confirmation within 4 to 6 weeks. Once registered, all past broadcast income from the Khabza album campaign will be claimable.',date:'2026-05-03',fromConsultant:true},
     ],
@@ -186,6 +196,9 @@ const CMO_META={
 
 function fmtR(n){if(!n&&n!==0)return'—';return'R '+n.toLocaleString('en-ZA',{minimumFractionDigits:0});}
 function fmtDate(d){return new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});}
+function statusColor(s){return{remitted:T.green,pending:T.amber,dispute:T.red,missing:T.red}[s]||T.sub;}
+function statusBg(s){return{remitted:T.greenBg,pending:T.amberBg,dispute:T.redBg,missing:T.redBg}[s]||'rgba(255,255,255,0.05)';}
+function statusLabel(s){return{remitted:'Done',pending:'Pending',dispute:'Dispute',missing:'Missing'}[s]||s;}
 function ago(d){
   const days=Math.floor((new Date()-new Date(d))/(86400000));
   if(days===0)return'Today';if(days===1)return'Yesterday';
@@ -278,6 +291,7 @@ function BottomNav({tab,setTab,redCount}){
     {id:'home',label:'Home',ico:'⌂'},
     {id:'cmo',label:'CMO',ico:'★'},
     {id:'tracks',label:'Tracks',ico:'♫'},
+    {id:'splits',label:'Splits',ico:'⎘'},
     {id:'money',label:'Money',ico:'$'},
     {id:'actions',label:'Actions',ico:'○',badge:redCount},
     {id:'messages',label:'Messages',ico:'✉'},
@@ -330,6 +344,20 @@ function HomeScreen({artist,setTab}){
         <div style={{fontSize:11,color:T.sub,marginTop:2}}>Actions needed</div>
       </div>
     </div>
+
+    <div onClick={()=>setTab('splits')} style={{margin:'0 16px 14px',background:T.card,border:`1px dashed ${T.bdrM}`,borderRadius:12,padding:'14px 16px',cursor:'pointer',display:'flex',alignItems:'center',gap:12}}>
+      <span style={{fontSize:20}}>🎙️</span>
+      <div style={{flex:1}}>
+        <div style={{fontSize:12,fontWeight:600,color:T.text}}>In the studio right now?</div>
+        <div style={{fontSize:11,color:T.sub,marginTop:1}}>Log the split sheet before everyone leaves — tap to start</div>
+      </div>
+      <span style={{color:T.faint,fontSize:14}}>›</span>
+    </div>
+
+    {(artist.splitSheets||[]).filter(s=>s.status==='submitted').length>0&&<div onClick={()=>setTab('splits')} style={{margin:'0 16px 14px',background:T.blueBg,border:`1px solid ${T.blue}40`,borderRadius:12,padding:'14px 16px',cursor:'pointer'}}>
+      <div style={{fontSize:12,fontWeight:600,color:T.blue}}>{(artist.splitSheets||[]).filter(s=>s.status==='submitted').length} split sheet{(artist.splitSheets||[]).filter(s=>s.status==='submitted').length!==1?'s':''} pending Agency 5 review</div>
+      <div style={{fontSize:11,color:T.sub,marginTop:3}}>View submissions →</div>
+    </div>}
 
     {hasCompass&&<div onClick={()=>setTab('compass')} style={{margin:'0 16px 14px',background:T.amberBg,border:`1px solid ${T.amber}40`,borderRadius:12,padding:'14px 16px',cursor:'pointer'}}>
       <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
@@ -410,7 +438,7 @@ function CmoScreen({artist}){
   </div>;
 }
 
-function TracksScreen({artist}){
+function TracksScreen({artist,onCreateSplit}){
   const [open,setOpen]=useState(null);
   const reg=artist.tracks.filter(t=>t.samro&&t.capasso).length;
   const part=artist.tracks.filter(t=>(t.samro||t.capasso)&&!(t.samro&&t.capasso)).length;
@@ -445,36 +473,180 @@ function TracksScreen({artist}){
             <div><div style={{color:T.text,fontWeight:500}}>{l}</div><div style={{fontSize:10,color:T.sub}}>{v?desc:'Pending'}</div></div>
             <span style={{fontSize:10,fontWeight:600,color:v?T.green:T.sub,background:v?T.greenBg:'rgba(255,255,255,0.04)',padding:'2px 8px',borderRadius:20}}>{v?'✓':'Pending'}</span>
           </div>)}
-          {!t.split&&<div style={{marginTop:8,fontSize:11,color:T.amber,background:T.amberBg,padding:'7px 10px',borderRadius:7}}>Split sheet not yet confirmed. Contact Agency 5 for changes to composition credits.</div>}
+          {!t.split&&<div style={{marginTop:8}}>
+            <div style={{fontSize:11,color:T.amber,background:T.amberBg,padding:'7px 10px',borderRadius:7,marginBottom:6}}>Split sheet not yet confirmed.</div>
+            <button onClick={()=>onCreateSplit&&onCreateSplit(t.title)} style={{width:'100%',padding:9,borderRadius:8,border:`1px solid ${T.accentBdr}`,background:T.accentBg,color:T.accentL,fontSize:12,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Fill in split sheet now</button>
+          </div>}
         </div>}
       </div>;
     })}
   </div>;
 }
 
+const SPLIT_ROLES=['Composer / Songwriter','Lyricist','Producer','Vocalist / Performer','Featured Artist','Beat Maker'];
+
+function SplitSheetForm({artist,prefillTitle,onCancel,onSubmit}){
+  const hasTracks=artist.tracks&&artist.tracks.length>0;
+  const [isNewTrack,setIsNewTrack]=useState(!prefillTitle&&!hasTracks);
+  const [trackTitle,setTrackTitle]=useState(prefillTitle||'');
+  const [rows,setRows]=useState([
+    {id:'c1',name:artist.stageName,role:'Composer / Songwriter',pub:'',master:'',ipi:'',contact:''},
+    {id:'c2',name:'',role:'Producer',pub:'',master:'',ipi:'',contact:''},
+  ]);
+
+  function updateRow(id,field,val){setRows(prev=>prev.map(r=>r.id===id?{...r,[field]:val}:r));}
+  function addRow(){setRows(prev=>[...prev,{id:'c'+Date.now(),name:'',role:'Composer / Songwriter',pub:'',master:'',ipi:'',contact:''}]);}
+  function removeRow(id){setRows(prev=>prev.filter(r=>r.id!==id));}
+
+  const totalPub=rows.reduce((s,r)=>s+(parseFloat(r.pub)||0),0);
+  const totalMaster=rows.reduce((s,r)=>s+(parseFloat(r.master)||0),0);
+  const pubOk=Math.round(totalPub)===100;
+  const canSubmit=trackTitle.trim()&&rows.length>0&&rows.every(r=>r.name.trim());
+
+  const inp={width:'100%',padding:'9px 10px',background:'rgba(255,255,255,0.05)',border:`1px solid ${T.bdrM}`,borderRadius:8,color:T.text,outline:'none',fontSize:12,fontFamily:'inherit',boxSizing:'border-box'};
+  const sel={...inp,appearance:'none'};
+
+  return <div style={{background:T.card,border:`1px solid ${T.bdrM}`,borderRadius:14,padding:16,marginBottom:18}}>
+    <div style={{fontSize:14,fontWeight:600,color:T.text,marginBottom:2}}>New split sheet</div>
+    <div style={{fontSize:11,color:T.sub,marginBottom:14,lineHeight:1.5}}>Fill this in while you're still in the studio — it goes straight to Agency 5 for review, signature chasing and CMO registration.</div>
+
+    <div style={{marginBottom:14}}>
+      <div style={{fontSize:11,color:T.sub,marginBottom:5,fontWeight:500}}>Track</div>
+      {hasTracks&&!isNewTrack?
+        <select style={sel} value={trackTitle} onChange={e=>{
+          if(e.target.value==='__new__'){setIsNewTrack(true);setTrackTitle('');}
+          else setTrackTitle(e.target.value);
+        }}>
+          <option value="">Select a track...</option>
+          {artist.tracks.map(t=><option key={t.title} value={t.title}>{t.title}</option>)}
+          <option value="__new__">+ New track (recording now)</option>
+        </select>
+        :
+        <div style={{display:'flex',gap:8,alignItems:'center'}}>
+          <input style={inp} value={trackTitle} onChange={e=>setTrackTitle(e.target.value)} placeholder="Working title of the track"/>
+          {hasTracks&&<button onClick={()=>setIsNewTrack(false)} style={{fontSize:11,color:T.accent,background:'none',border:'none',cursor:'pointer',whiteSpace:'nowrap'}}>Use existing</button>}
+        </div>
+      }
+    </div>
+
+    <div style={{fontSize:11,color:T.sub,marginBottom:8,fontWeight:500}}>Contributors</div>
+    {rows.map((r,i)=><div key={r.id} style={{background:T.surf,border:`1px solid ${T.bdr}`,borderRadius:10,padding:12,marginBottom:8}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+        <span style={{fontSize:11,fontWeight:600,color:T.sub}}>Contributor {i+1}</span>
+        {rows.length>1&&<button onClick={()=>removeRow(r.id)} style={{fontSize:11,color:T.red,background:'none',border:'none',cursor:'pointer'}}>Remove</button>}
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:8}}>
+        <input style={inp} value={r.name} onChange={e=>updateRow(r.id,'name',e.target.value)} placeholder="Full name"/>
+        <select style={sel} value={r.role} onChange={e=>updateRow(r.id,'role',e.target.value)}>
+          {SPLIT_ROLES.map(role=><option key={role} value={role}>{role}</option>)}
+        </select>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:8}}>
+        <div>
+          <div style={{fontSize:10,color:T.sub,marginBottom:3}}>Publishing %</div>
+          <input style={inp} type="number" min="0" max="100" value={r.pub} onChange={e=>updateRow(r.id,'pub',e.target.value)} placeholder="e.g. 25"/>
+        </div>
+        <div>
+          <div style={{fontSize:10,color:T.sub,marginBottom:3}}>Master %</div>
+          <input style={inp} type="number" min="0" max="100" value={r.master} onChange={e=>updateRow(r.id,'master',e.target.value)} placeholder="If applicable"/>
+        </div>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+        <input style={inp} value={r.ipi} onChange={e=>updateRow(r.id,'ipi',e.target.value)} placeholder="IPI / SAMRO no. (optional)"/>
+        <input style={inp} value={r.contact} onChange={e=>updateRow(r.id,'contact',e.target.value)} placeholder="Phone or email"/>
+      </div>
+    </div>)}
+    <button onClick={addRow} style={{width:'100%',padding:9,borderRadius:8,border:`1px dashed ${T.bdrM}`,background:'transparent',color:T.accent,fontSize:12,cursor:'pointer',fontFamily:'inherit',marginBottom:14}}>+ Add contributor</button>
+
+    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 12px',borderRadius:8,background:pubOk?T.greenBg:T.amberBg,marginBottom:14}}>
+      <span style={{fontSize:11,color:pubOk?T.green:T.amber,fontWeight:600}}>Publishing split total</span>
+      <span style={{fontSize:13,fontWeight:700,color:pubOk?T.green:T.amber,fontFamily:'DM Mono'}}>{totalPub}%{!pubOk?' — should total 100%':''}</span>
+    </div>
+
+    <div style={{display:'flex',gap:8}}>
+      <button onClick={onCancel} style={{flex:1,padding:12,borderRadius:10,border:`1px solid ${T.bdrM}`,background:'transparent',color:T.sub,fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>Cancel</button>
+      <button onClick={()=>canSubmit&&onSubmit({trackTitle:trackTitle.trim(),contributors:rows,totalPub,totalMaster})} disabled={!canSubmit} style={{flex:2,padding:12,borderRadius:10,border:'none',background:canSubmit?`linear-gradient(135deg,${T.accent},${T.accentD})`:'rgba(255,255,255,0.05)',color:canSubmit?'#fff':T.faint,fontSize:13,fontWeight:600,cursor:canSubmit?'pointer':'default',fontFamily:'inherit'}}>Send to Agency 5</button>
+    </div>
+  </div>;
+}
+
+function SplitSheetsScreen({artist,setArtist,prefillTitle,clearPrefill}){
+  const [showForm,setShowForm]=useState(!!prefillTitle);
+
+  useEffect(()=>{ if(prefillTitle) setShowForm(true); },[prefillTitle]);
+
+  function handleSubmit(data){
+    const entry={
+      id:'sp'+Date.now(),
+      trackTitle:data.trackTitle,
+      contributors:data.contributors,
+      totalPub:data.totalPub,
+      totalMaster:data.totalMaster,
+      status:'submitted',
+      dateSubmitted:new Date().toISOString(),
+    };
+    setArtist(prev=>({
+      ...prev,
+      splitSheets:[entry,...(prev.splitSheets||[])],
+      activity:[{date:new Date().toISOString(),text:`Split sheet submitted for "${data.trackTitle}" — sent to Agency 5 for review.`,type:'action'},...prev.activity],
+    }));
+    setShowForm(false);
+    if(clearPrefill)clearPrefill();
+  }
+
+  function handleCancel(){
+    setShowForm(false);
+    if(clearPrefill)clearPrefill();
+  }
+
+  const sheets=artist.splitSheets||[];
+
+  return <div style={{padding:'20px 16px 80px'}}>
+    <div style={{marginBottom:14}}>
+      <div style={{fontSize:20,fontWeight:700,color:T.text,marginBottom:4}}>Split Sheets</div>
+      <div style={{fontSize:12,color:T.sub,lineHeight:1.5}}>Capture composition and master splits while you're still in the studio — much easier than reconstructing them later.</div>
+    </div>
+
+    {!showForm&&<button onClick={()=>setShowForm(true)} style={{width:'100%',padding:14,borderRadius:12,border:`1px dashed ${T.accentBdr}`,background:T.accentBg,color:T.accentL,fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit',marginBottom:18}}>+ Start a new split sheet</button>}
+
+    {showForm&&<SplitSheetForm artist={artist} prefillTitle={prefillTitle} onCancel={handleCancel} onSubmit={handleSubmit}/>}
+
+    <div style={{fontSize:13,fontWeight:600,color:T.text,marginBottom:10}}>Submitted split sheets</div>
+    {sheets.length===0&&<div style={{fontSize:12,color:T.sub,padding:'4px 0 12px'}}>No split sheets submitted yet.</div>}
+    {sheets.map(s=><div key={s.id} style={{background:T.card,border:`1px solid ${T.bdr}`,borderRadius:12,padding:'12px 14px',marginBottom:8}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:6,gap:8}}>
+        <span style={{fontSize:13,fontWeight:600,color:T.text}}>{s.trackTitle}</span>
+        <span style={{fontSize:9,fontWeight:600,padding:'2px 8px',borderRadius:20,background:T.amberBg,color:T.amber,textTransform:'uppercase',letterSpacing:'0.05em',whiteSpace:'nowrap'}}>Pending review</span>
+      </div>
+      <div style={{fontSize:11,color:T.sub,marginBottom:6}}>{s.contributors.length} contributor{s.contributors.length!==1?'s':''} · {s.totalPub}% publishing logged · {ago(s.dateSubmitted)}</div>
+      <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
+        {s.contributors.map((c,i)=><span key={i} style={{fontSize:10,color:T.sub,background:'rgba(255,255,255,0.04)',padding:'2px 8px',borderRadius:10}}>{c.name||'—'} · {c.pub||0}%</span>)}
+      </div>
+    </div>)}
+
+    <div style={{padding:'12px 14px',background:T.surf,border:`1px solid ${T.bdr}`,borderRadius:10,fontSize:11,color:T.sub,lineHeight:1.6,marginTop:14}}>
+      Submissions here go to Agency 5 for verification — including checking IPI/SAMRO numbers and collecting signatures from all contributors — before splits are registered with SAMRO and CAPASSO.
+    </div>
+  </div>;
+}
+
 function MoneyScreen({artist}){
   const [sub,setSub]=useState('balance');
   const f=artist.financials;
-
-  function statusColor(s){return s==='remitted'?T.green:s==='dispute'||s==='missing'?T.red:T.amber;}
-  function statusBg(s){return s==='remitted'?T.greenBg:s==='dispute'||s==='missing'?T.redBg:T.amberBg;}
-  function statusLabel(s){return s==='remitted'?'Done':s==='pending'?'Pending':s==='dispute'?'Dispute':'Missing';}
-
   return <div style={{paddingBottom:80}}>
     <div style={{padding:'20px 16px 0',marginBottom:14}}>
       <div style={{fontSize:20,fontWeight:700,color:T.text,marginBottom:4}}>Financials</div>
       <div style={{fontSize:12,color:T.sub}}>Collections, remittances and statements</div>
     </div>
-    <div style={{display:'flex',padding:'0 16px',gap:6,marginBottom:14,overflowX:'auto'}}>
-      {[['balance','Balance'],['breakdown','Breakdown'],['remittances','Remittances'],['statements','Statements']].map(([id,l])=><button key={id} onClick={()=>setSub(id)} style={{padding:'6px 14px',borderRadius:20,border:`1px solid ${sub===id?T.accent:T.bdrM}`,background:sub===id?T.accentBg:'transparent',color:sub===id?T.accentL:T.sub,cursor:'pointer',fontSize:12,fontWeight:sub===id?500:400,fontFamily:'inherit',whiteSpace:'nowrap'}}>{l}</button>)}
+    <div style={{display:'flex',padding:'0 16px',gap:6,marginBottom:14}}>
+      {[['balance','Balance'],['breakdown','Breakdown'],['remittances','Remittances'],['statements','Statements']].map(([id,l])=><button key={id} onClick={()=>setSub(id)} style={{padding:'6px 14px',borderRadius:20,border:`1px solid ${sub===id?T.accent:T.bdrM}`,background:sub===id?T.accentBg:'transparent',color:sub===id?T.accentL:T.sub,cursor:'pointer',fontSize:12,fontWeight:sub===id?500:400,fontFamily:'inherit'}}>{l}</button>)}
     </div>
-
     {sub==='balance'&&<div style={{padding:'0 16px'}}>
       <div style={{background:`linear-gradient(135deg,${T.accent}18,${T.accentD}10)`,border:`1px solid ${T.accentBdr}`,borderRadius:14,padding:'20px',marginBottom:12}}>
         <div style={{fontSize:11,color:T.accentL,marginBottom:8,textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:600}}>Current balance</div>
         <div style={{fontSize:38,fontWeight:700,color:T.text,letterSpacing:'-1.5px',lineHeight:1}}>{fmtR(f.collected)}</div>
         <div style={{display:'flex',gap:16,marginTop:14,paddingTop:12,borderTop:'1px solid rgba(255,255,255,0.07)'}}>
-          <div><div style={{fontSize:10,color:T.sub,marginBottom:2}}>Collected (net)</div><div style={{fontSize:14,fontWeight:600,color:T.green}}>{fmtR(f.collected)}</div></div>
+          <div><div style={{fontSize:10,color:T.sub,marginBottom:2}}>Available</div><div style={{fontSize:14,fontWeight:600,color:T.green}}>{fmtR(f.collected)}</div></div>
           <div><div style={{fontSize:10,color:T.sub,marginBottom:2}}>Pending</div><div style={{fontSize:14,fontWeight:600,color:T.amber}}>{fmtR(f.pending)}</div></div>
         </div>
       </div>
@@ -487,76 +659,72 @@ function MoneyScreen({artist}){
         Agency 5 retains a 20% administration commission on all CMO collections. All collections and deductions are detailed in your quarterly statements.
       </div>
     </div>}
-
-    {sub==='breakdown'&&<div style={{padding:'0 16px'}}>
-      <div style={{fontSize:11,fontWeight:600,color:T.sub,textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:10}}>CMO Collections</div>
-      {f.cmoHistory.map((src,si)=>{
-        const col={capasso:T.capasso,samro:T.samro,sampra:T.sampra,airco:T.accentL}[src.cmo]||T.accent;
-        const meta=CMO_META[src.cmo]||{label:src.cmo.toUpperCase(),desc:''};
-        const total=src.entries.filter(e=>e.gross).reduce((a,e)=>a+e.gross,0);
-        return <div key={si} style={{background:T.card,border:`1px solid ${col}28`,borderRadius:12,padding:'14px 16px',marginBottom:10}}>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
-            <div style={{display:'flex',alignItems:'center',gap:10}}>
-              <div style={{width:34,height:34,borderRadius:8,background:`${col}18`,border:`1px solid ${col}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:9,fontWeight:700,color:col,flexShrink:0}}>{meta.label}</div>
+    {sub==='breakdown'&&<div style={{padding:'0 16px 20px'}}>
+      <div style={{marginBottom:16}}>
+        <div style={{fontSize:15,fontWeight:600,color:T.text,marginBottom:2}}>CMO Income by Society</div>
+        <div style={{fontSize:11,color:T.sub}}>Payments are net of 20% Agency 5 commission</div>
+      </div>
+      {(f.cmoHistory||[]).map(c=>{
+        const meta=CMO_META[c.cmo]||{label:c.cmo,color:T.accentL};
+        const total=c.entries.reduce((s,e)=>s+(e.gross||0),0);
+        return <div key={c.cmo} style={{background:T.card,border:`1px solid ${T.bdr}`,borderRadius:12,padding:'14px 16px',marginBottom:10}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <div style={{width:8,height:8,borderRadius:4,background:meta.color,flexShrink:0}}/>
               <div>
                 <div style={{fontSize:13,fontWeight:600,color:T.text}}>{meta.label}</div>
-                <div style={{fontSize:10,color:T.sub}}>{src.scheduleNote}</div>
+                <div style={{fontSize:10,color:T.sub}}>{c.schedule} · {c.scheduleNote}</div>
               </div>
             </div>
-            <span style={{fontSize:9,fontWeight:600,color:col,background:`${col}18`,padding:'2px 8px',borderRadius:20,flexShrink:0}}>{src.schedule}</span>
+            <div style={{textAlign:'right'}}>
+              {total>0&&<div style={{fontSize:13,fontWeight:600,color:T.text}}>{fmtR(total)}</div>}
+              <div style={{fontSize:10,color:T.sub}}>Next: {c.nextExpected}</div>
+            </div>
           </div>
-          {src.entries.length>0?<div style={{borderTop:`1px solid ${T.bdr}`,paddingTop:8}}>
-            {src.entries.map((e,ei)=><div key={ei} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'5px 0',borderBottom:ei<src.entries.length-1?`1px solid ${T.bdr}`:'none',fontSize:11}}>
-              <span style={{color:T.sub}}>{e.period}</span>
-              <div style={{display:'flex',alignItems:'center',gap:6}}>
-                {e.gross?<span style={{color:T.text,fontFamily:'DM Mono',fontWeight:500}}>{fmtR(e.gross)}</span>:<span style={{color:T.sub,fontFamily:'DM Mono'}}>—</span>}
-                <span style={{fontSize:9,fontWeight:600,color:statusColor(e.status),background:statusBg(e.status),padding:'1px 6px',borderRadius:10}}>{statusLabel(e.status)}</span>
+          {c.entries.length===0?<div style={{fontSize:11,color:T.sub,fontStyle:'italic',padding:'6px 0'}}>No collections yet</div>:
+            c.entries.map((e,i)=><div key={i} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'7px 0',borderTop:`1px solid ${T.bdr}`}}>
+              <div style={{fontSize:12,color:T.sub}}>{e.period}</div>
+              <div style={{display:'flex',alignItems:'center',gap:8}}>
+                <div style={{fontSize:12,fontWeight:500,color:T.text}}>{e.gross?fmtR(e.gross):'—'}</div>
+                <span style={{fontSize:9,fontWeight:600,padding:'2px 7px',borderRadius:20,color:statusColor(e.status),background:statusBg(e.status)}}>{statusLabel(e.status)}</span>
               </div>
             </div>)}
-            {total>0&&<div style={{marginTop:8,paddingTop:8,borderTop:`1px solid ${T.bdr}`,fontSize:11,color:T.sub}}>Gross collected: <span style={{color:T.green,fontWeight:600,fontFamily:'DM Mono'}}>{fmtR(total)}</span></div>}
-          </div>:<div style={{borderTop:`1px solid ${T.bdr}`,paddingTop:8,fontSize:11,color:T.sub,lineHeight:1.5}}>No collections yet.</div>}
-          <div style={{marginTop:6,fontSize:10,color:T.faint}}>Next: {src.nextExpected}</div>
         </div>;
       })}
-
-      <div style={{fontSize:11,fontWeight:600,color:T.sub,textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:10,marginTop:4}}>Distributor Income</div>
-      {f.dspHistory.map((src,si)=>{
-        const col=src.type==='crbt'?T.accentL:T.blue;
-        return <div key={si} style={{background:T.card,border:`1px solid ${col}28`,borderRadius:12,padding:'14px 16px',marginBottom:10}}>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+      <div style={{fontSize:15,fontWeight:600,color:T.text,marginBottom:12,marginTop:6}}>Distributor Income</div>
+      {(f.dspHistory||[]).map((d,di)=>{
+        const total=d.entries.reduce((s,e)=>s+(e.gross||0),0);
+        const isCrbt=d.type==='crbt';
+        return <div key={di} style={{background:T.card,border:`1px solid ${isCrbt?T.accentL+'30':T.bdr}`,borderRadius:12,padding:'14px 16px',marginBottom:10}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
             <div>
-              <div style={{fontSize:13,fontWeight:600,color:T.text}}>{src.source}</div>
-              <div style={{fontSize:10,color:T.sub}}>{src.scheduleNote}</div>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                <div style={{fontSize:13,fontWeight:600,color:T.text}}>{d.source}</div>
+                {isCrbt&&<span style={{fontSize:9,fontWeight:700,padding:'1px 6px',borderRadius:20,background:T.accentBg,color:T.accentL}}>CRBT</span>}
+              </div>
+              <div style={{fontSize:10,color:T.sub,marginTop:1}}>{d.schedule} · {d.scheduleNote}</div>
             </div>
-            <span style={{fontSize:9,fontWeight:600,color:col,background:`${col}18`,padding:'2px 8px',borderRadius:20,flexShrink:0}}>{src.schedule}</span>
+            <div style={{textAlign:'right'}}>
+              {total>0&&<div style={{fontSize:13,fontWeight:600,color:T.text}}>{fmtR(total)}</div>}
+              <div style={{fontSize:10,color:T.sub}}>Next: {d.nextExpected}</div>
+            </div>
           </div>
-          {src.entries.length>0&&<div style={{borderTop:`1px solid ${T.bdr}`,paddingTop:8}}>
-            {src.entries.map((e,ei)=><div key={ei} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 0',borderBottom:ei<src.entries.length-1?`1px solid ${T.bdr}`:'none',fontSize:11}}>
-              <div style={{flex:1,paddingRight:8}}>
-                <div style={{color:T.sub}}>{e.period}</div>
-                {e.note&&<div style={{fontSize:10,color:T.red,marginTop:2}}>{e.note}</div>}
+          {d.note&&<div style={{fontSize:11,color:T.accentL,background:T.accentBg,padding:'6px 10px',borderRadius:7,marginBottom:8}}>{d.note}</div>}
+          {d.entries.length===0?<div style={{fontSize:11,color:T.sub,fontStyle:'italic',padding:'6px 0'}}>No entries yet</div>:
+            d.entries.map((e,i)=><div key={i} style={{borderTop:`1px solid ${T.bdr}`,padding:'7px 0'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                <div style={{fontSize:12,color:T.sub}}>{e.period}</div>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  <div style={{fontSize:12,fontWeight:500,color:T.text}}>{e.gross?fmtR(e.gross):'—'}</div>
+                  <span style={{fontSize:9,fontWeight:600,padding:'2px 7px',borderRadius:20,color:statusColor(e.status),background:statusBg(e.status)}}>{statusLabel(e.status)}</span>
+                </div>
               </div>
-              <div style={{display:'flex',alignItems:'center',gap:6,flexShrink:0}}>
-                {e.gross?<span style={{color:T.text,fontFamily:'DM Mono',fontWeight:500}}>{fmtR(e.gross)}</span>:<span style={{color:T.sub,fontFamily:'DM Mono'}}>—</span>}
-                <span style={{fontSize:9,fontWeight:600,color:statusColor(e.status),background:statusBg(e.status),padding:'1px 6px',borderRadius:10}}>{statusLabel(e.status)}</span>
-              </div>
+              {e.note&&<div style={{fontSize:11,color:statusColor(e.status),marginTop:4}}>⚠ {e.note}</div>}
             </div>)}
-          </div>}
-          {src.note&&<div style={{marginTop:8,paddingTop:src.entries.length>0?8:0,borderTop:src.entries.length>0?`1px solid ${T.bdr}`:'none',fontSize:11,color:T.sub,lineHeight:1.5}}>{src.note}</div>}
-          <div style={{marginTop:6,fontSize:10,color:T.faint}}>Next: {src.nextExpected}</div>
         </div>;
       })}
-
-      <div style={{padding:'12px 14px',background:T.surf,border:`1px solid ${T.accentBdr}`,borderRadius:10,fontSize:11,color:T.sub,lineHeight:1.7,marginTop:4}}>
-        <div style={{fontWeight:600,color:T.text,marginBottom:8,fontSize:12}}>How your income flows</div>
-        <div style={{marginBottom:6,display:'flex',gap:8}}><span>🎵</span><span><strong style={{color:T.text}}>DSP streams</strong> (Spotify, Apple Music, YouTube) generate two separate royalty streams — master income via your distributor, <em>and</em> publishing royalties collected by CAPASSO.</span></div>
-        <div style={{marginBottom:6,display:'flex',gap:8}}><span>📱</span><span><strong style={{color:T.text}}>CRBT / RBT</strong> ringtone and ringback downloads generate AIRCO income — tracked quarterly once you are registered. MTN income is already being estimated.</span></div>
-        <div style={{display:'flex',gap:8}}><span>📻</span><span><strong style={{color:T.text}}>Radio & broadcast</strong> airplay feeds SAMRO (performance royalties) and CAPASSO (publishing royalties) simultaneously.</span></div>
-      </div>
     </div>}
-
     {sub==='remittances'&&<div style={{padding:'0 16px'}}>
-      <div style={{fontSize:11,color:T.sub,marginBottom:12}}>Payments made to you by Agency 5</div>
       {f.remittances.map(r=><div key={r.id} style={{background:T.card,border:`1px solid ${T.bdr}`,borderRadius:12,padding:'14px 16px',marginBottom:8,display:'flex',alignItems:'center',gap:12}}>
         <div style={{width:36,height:36,borderRadius:10,background:T.greenBg,display:'flex',alignItems:'center',justifyContent:'center',color:T.green,fontSize:16,flexShrink:0}}>✓</div>
         <div style={{flex:1}}>
@@ -568,11 +736,7 @@ function MoneyScreen({artist}){
           <span style={{fontSize:10,fontWeight:600,color:T.green,background:T.greenBg,padding:'1px 7px',borderRadius:20}}>Paid</span>
         </div>
       </div>)}
-      <div style={{marginTop:4,padding:'10px 12px',background:T.surf,border:`1px solid ${T.bdr}`,borderRadius:10,fontSize:11,color:T.sub,lineHeight:1.6}}>
-        These are net amounts after 20% commission. Tap Breakdown to see the gross CMO collections behind each remittance.
-      </div>
     </div>}
-
     {sub==='statements'&&<div style={{padding:'0 16px'}}>
       {f.statements.map(s=>{
         const flag=s.status.includes('flag')||s.status.includes('Missing');
@@ -633,6 +797,7 @@ function CompassScreen({artist}){
     </div>
   </div>;
   const scoreColor=c.score>=7?T.green:c.score>=4?T.amber:T.red;
+  const scoreBg=c.score>=7?T.greenBg:c.score>=4?T.amberBg:T.redBg;
   return <div style={{padding:'20px 16px 80px'}}>
     <div style={{marginBottom:14}}>
       <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
@@ -753,14 +918,21 @@ function ProfileScreen({artist,onLogout}){
 function App(){
   const [artist,setArtist]=useState(null);
   const [tab,setTab]=useState('home');
+  const [splitPrefill,setSplitPrefill]=useState(null);
 
   if(!artist) return <LoginScreen onLogin={a=>{setArtist(a);setTab('home');}}/>;
 
-  const titles={home:'',cmo:'CMO Status',tracks:'My Catalogue',money:'Financials',actions:'Actions',compass:'Contract Compass',messages:'Messages',profile:'Settings'};
+  function startSplitSheet(title){
+    setSplitPrefill(title||'');
+    setTab('splits');
+  }
+
+  const titles={home:'',cmo:'CMO Status',tracks:'My Catalogue',splits:'Split Sheets',money:'Financials',actions:'Actions',compass:'Contract Compass',messages:'Messages',profile:'Settings'};
   const screens={
     home:<HomeScreen artist={artist} setTab={setTab}/>,
     cmo:<CmoScreen artist={artist}/>,
-    tracks:<TracksScreen artist={artist}/>,
+    tracks:<TracksScreen artist={artist} onCreateSplit={startSplitSheet}/>,
+    splits:<SplitSheetsScreen artist={artist} setArtist={setArtist} prefillTitle={splitPrefill} clearPrefill={()=>setSplitPrefill(null)}/>,
     money:<MoneyScreen artist={artist}/>,
     actions:<ActionsScreen artist={artist}/>,
     compass:<CompassScreen artist={artist}/>,
