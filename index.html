@@ -7,6 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'DM Sans',sans-serif;}
@@ -37,6 +38,73 @@ const T={
   blue:'#4AADE8',blueBg:'rgba(74,173,232,0.10)',
   samro:'#E8A23C',capasso:'#4AADE8',sampra:'#2ECC8A',airco:'#9D82FF',
 };
+
+const SUPA=window.supabase.createClient(
+  'https://jsqarcpqbtjoaoecfszy.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzcWFyY3BxYnRqb2FvZWNmc3p5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTEyMzMsImV4cCI6MjA5NzQ2NzIzM30.JVAKESyvTnQr4hjpfebCZTm4STPL_QYa5BTaSLprkvU'
+);
+
+const CMO_SCHED={
+  capasso:{schedule:'Bi-annual',scheduleNote:'Pays in Jan & Jul'},
+  samro:{schedule:'Quarterly',scheduleNote:'Mar, Jun, Sep, Dec'},
+  sampra:{schedule:'Annual',scheduleNote:'Jul each year'},
+  airco:{schedule:'Quarterly',scheduleNote:'Quarterly when registered'},
+};
+
+async function fetchArtistFromSupabase(artistId){
+  const [
+    {data:a},{data:cmos},{data:trackRows},{data:remits},
+    {data:acts},{data:msgs},{data:activity},{data:cmoHist},{data:dspHist}
+  ]=await Promise.all([
+    SUPA.from('artists').select('*').eq('id',artistId).single(),
+    SUPA.from('cmo_registrations').select('*').eq('artist_id',artistId),
+    SUPA.from('tracks').select('*').eq('artist_id',artistId),
+    SUPA.from('remittances').select('*').eq('artist_id',artistId).order('date',{ascending:false}),
+    SUPA.from('portal_actions').select('*').eq('artist_id',artistId).eq('resolved',false).order('date',{ascending:false}),
+    SUPA.from('portal_messages').select('*').eq('artist_id',artistId).order('sent_at',{ascending:false}),
+    SUPA.from('artist_activity').select('*').eq('artist_id',artistId).order('event_date',{ascending:false}),
+    SUPA.from('cmo_history').select('*').eq('artist_id',artistId),
+    SUPA.from('dsp_history').select('*').eq('artist_id',artistId),
+  ]);
+  const cmo={};
+  for(const r of (cmos||[])){
+    cmo[r.cmo]={
+      status:r.status,memberNum:r.member_num,lastCollection:r.last_collection,
+      lastAmount:r.last_amount!=null?Number(r.last_amount):null,
+      nextExpected:r.next_expected,stage:r.stage,
+      stages:r.stage_labels?(typeof r.stage_labels==='string'?JSON.parse(r.stage_labels):r.stage_labels):undefined,
+      note:r.notes,
+    };
+  }
+  const cmoHistMap={};
+  for(const row of (cmoHist||[])){
+    if(!cmoHistMap[row.cmo]) cmoHistMap[row.cmo]={cmo:row.cmo,...(CMO_SCHED[row.cmo]||{}),nextExpected:cmo[row.cmo]?.nextExpected||'TBD',entries:[]};
+    cmoHistMap[row.cmo].entries.push({period:row.period,gross:row.gross!=null?Number(row.gross):null,status:row.status,note:row.note});
+  }
+  const dspHistMap={};
+  for(const row of (dspHist||[])){
+    if(!dspHistMap[row.source]) dspHistMap[row.source]={source:row.source,type:row.income_type,schedule:row.schedule,scheduleNote:row.schedule_note,nextExpected:row.next_expected,note:row.note,entries:[]};
+    dspHistMap[row.source].entries.push({period:row.period,gross:row.gross!=null?Number(row.gross):null,status:row.status,note:row.entry_note});
+  }
+  return {
+    id:a.id,stageName:a.name,legalName:a.legal_name,initials:a.initials,color:a.brand_color,
+    email:a.email,consultant:a.consultant,plan:a.plan,entity:a.entity,distributor:a.distributor||'—',
+    cmo,
+    tracks:(trackRows||[]).map(t=>({title:t.title,isrc:t.isrc,samro:t.samro,capasso:t.capasso,sampra:t.sampra,split:t.has_split})),
+    financials:{
+      collected:Number(a.collected)||0,pending:Number(a.pending)||0,nextDate:a.next_remit_date,
+      remittances:(remits||[]).map(r=>({id:r.id,date:r.date,amount:Number(r.amount),source:r.source,status:r.status})),
+      statements:[],
+      cmoHistory:Object.values(cmoHistMap),
+      dspHistory:Object.values(dspHistMap),
+    },
+    actions:(acts||[]).map(ac=>({id:ac.id,type:ac.action_type,title:ac.title,detail:ac.detail,urgency:ac.urgency,date:ac.date})),
+    activity:(activity||[]).map(av=>({date:av.event_date,text:av.body,type:av.event_type})),
+    compass:{},splitSheets:[],
+    messages:(msgs||[]).map(m=>({id:m.id,from:m.from_name,initials:m.initials,color:m.color,text:m.body,date:m.sent_at,fromConsultant:m.from_consultant})),
+    _fromSupabase:true,
+  };
+}
 
 const ARTISTS=[
   {
@@ -230,13 +298,18 @@ function LoginScreen({onLogin}){
   const [err,setErr]=useState('');
   const [loading,setLoading]=useState(false);
 
-  function attempt(){
+  async function attempt(){
     if(!email.trim()||!pass.trim())return;
     setErr('');setLoading(true);
-    setTimeout(()=>{
-      const a=ARTISTS.find(x=>x.email.toLowerCase()===email.trim().toLowerCase()&&x.password===pass.trim());
-      if(a)onLogin(a); else{setErr('Email or password not recognised.');setLoading(false);}
-    },700);
+    const {data:authData}=await SUPA.auth.signInWithPassword({email:email.trim(),password:pass.trim()});
+    if(authData?.session){
+      try{
+        const {data:pu}=await SUPA.from('artist_portal_users').select('artist_id').eq('user_id',authData.user.id).single();
+        if(pu){const a=await fetchArtistFromSupabase(pu.artist_id);onLogin(a);return;}
+      }catch(e){}
+    }
+    const a=ARTISTS.find(x=>x.email.toLowerCase()===email.trim().toLowerCase()&&x.password===pass.trim());
+    if(a){onLogin(a);}else{setErr('Email or password not recognised.');setLoading(false);}
   }
 
   const inp={width:'100%',padding:'12px 14px',background:'rgba(255,255,255,0.05)',border:`1px solid ${T.bdrM}`,borderRadius:10,color:T.text,outline:'none',fontSize:14,fontFamily:'inherit',boxSizing:'border-box'};
@@ -919,7 +992,21 @@ function App(){
   const [artist,setArtist]=useState(null);
   const [tab,setTab]=useState('home');
   const [splitPrefill,setSplitPrefill]=useState(null);
+  const [restoring,setRestoring]=useState(true);
 
+  useEffect(()=>{
+    SUPA.auth.getSession().then(async({data:{session}})=>{
+      if(session){
+        try{
+          const {data:pu}=await SUPA.from('artist_portal_users').select('artist_id').eq('user_id',session.user.id).single();
+          if(pu){const a=await fetchArtistFromSupabase(pu.artist_id);setArtist(a);}
+        }catch(e){}
+      }
+      setRestoring(false);
+    });
+  },[]);
+
+  if(restoring) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh',background:T.bg,color:T.sub,fontSize:13}}>Loading…</div>;
   if(!artist) return <LoginScreen onLogin={a=>{setArtist(a);setTab('home');}}/>;
 
   function startSplitSheet(title){
@@ -937,7 +1024,7 @@ function App(){
     actions:<ActionsScreen artist={artist}/>,
     compass:<CompassScreen artist={artist}/>,
     messages:<MessagesScreen artist={artist}/>,
-    profile:<ProfileScreen artist={artist} onLogout={()=>{setArtist(null);setTab('home');}}/>,
+    profile:<ProfileScreen artist={artist} onLogout={async()=>{if(artist._fromSupabase)await SUPA.auth.signOut();setArtist(null);setTab('home');}}/>,
   };
 
   return <div style={{background:T.bg,minHeight:'100vh',maxWidth:430,margin:'0 auto',position:'relative',overflowX:'hidden'}}>
