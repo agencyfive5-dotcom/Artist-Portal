@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Soundclaim Artist Portal</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -50,6 +50,28 @@ const CMO_SCHED={
   sampra:{schedule:'Annual',scheduleNote:'Jul each year'},
   airco:{schedule:'Quarterly',scheduleNote:'Quarterly when registered'},
 };
+
+// Picks the most recent agreement analysis that Agency 5 marked "Share with artist"
+// in SoundClaim (stored on the artists row as publishing_agreements / deal_agreements).
+function buildSharedCompass(a){
+  const all=[...(Array.isArray(a.publishing_agreements)?a.publishing_agreements:[]),
+             ...(Array.isArray(a.deal_agreements)?a.deal_agreements:[])];
+  const shared=all.filter(x=>x&&x.compassStatus==='ready_to_share'&&x.compassAnalysis)
+    .sort((x,y)=>String(y.compassAnalysedAt||'').localeCompare(String(x.compassAnalysedAt||'')));
+  if(!shared.length) return {has:false,shared:false};
+  const ag=shared[0], an=ag.compassAnalysis, kd=an.keyDates||{};
+  const due=kd.autoRenewalNoticeDue||null;
+  const daysLeft=due?Math.ceil((new Date(due)-new Date())/86400000):null;
+  return {
+    has:true,shared:true,
+    name:(ag.publisher||ag.counterparty||'Agreement')+(ag.type?' — '+ag.type:''),
+    score:an.artistProtectionScore??'—',
+    assessment:an.overallAssessment||an.summary||'',
+    redFlags:(an.redFlags||[]).length,amberFlags:(an.amberFlags||[]).length,
+    autoRenewal:!!(kd.autoRenewal&&due&&daysLeft>=0),noticeDeadline:due,daysLeft,
+    otherShared:shared.length-1,
+  };
+}
 
 async function fetchArtistFromSupabase(artistId){
   const [
@@ -100,160 +122,11 @@ async function fetchArtistFromSupabase(artistId){
     },
     actions:(acts||[]).map(ac=>({id:ac.id,type:ac.action_type,title:ac.title,detail:ac.detail,urgency:ac.urgency,date:ac.date})),
     activity:(activity||[]).map(av=>({date:av.event_date,text:av.body,type:av.event_type})),
-    compass:{},splitSheets:[],
+    compass:buildSharedCompass(a),splitSheets:[],
     messages:(msgs||[]).map(m=>({id:m.id,from:m.from_name,initials:m.initials,color:m.color,text:m.body,date:m.sent_at,fromConsultant:m.from_consultant})),
     _fromSupabase:true,
   };
 }
-
-const ARTISTS=[
-  {
-    id:'busta929',stageName:'Busta 929',legalName:'Thapelo Theo Ndou',initials:'B9',color:'#1A5FA3',
-    email:'busta929@soundclaim.co.za',password:'busta929',consultant:'Jerome Lindsey Arends',plan:'Premium',
-    entity:'Thupa Industry',distributor:'Electromode',
-    cmo:{
-      samro:{status:'registered',memberNum:'SAM-2019-04471',lastCollection:'Q2 2024',lastAmount:28400,nextExpected:'Q4 2025'},
-      capasso:{status:'registered',memberNum:'PCA-THUPAINDUSTRY',lastCollection:'Q1 2024',lastAmount:142600,nextExpected:'Q3 2025'},
-      sampra:{status:'in_progress',stage:2,stages:['Documents prepared','Submitted','Under review','Registered'],nextExpected:'Est. Q1 2026'},
-      airco:{status:'not_registered',note:'Agency 5 is assessing eligibility. CRBT income from MTN estimated at R18,000 to R35,000 per year.'},
-    },
-    tracks:[
-      {title:'Umsebenzi Wethu',isrc:'ZA-RT5-21-00234',samro:true,capasso:true,sampra:false,split:true},
-      {title:'Sithi Sithi',isrc:'ZA-RT5-21-00291',samro:true,capasso:true,sampra:false,split:true},
-      {title:'VSOP feat. Reece Madlisa',isrc:'ZA-RT5-21-00298',samro:true,capasso:true,sampra:false,split:false},
-      {title:'Ngixolele feat. Boohle',isrc:'ZA-RT5-20-00187',samro:true,capasso:false,sampra:false,split:false},
-      {title:'Mmapula feat. Mzu M',isrc:'ZA-RT5-21-00312',samro:true,capasso:true,sampra:false,split:true},
-      {title:'Dakiwe',isrc:'ZA-RT5-22-00041',samro:true,capasso:false,sampra:false,split:false},
-      {title:'Gqoz Gqoz feat. Mafidzodzo',isrc:'ZA-RT5-21-00401',samro:true,capasso:true,sampra:false,split:true},
-      {title:'Beke Le Beke',isrc:'ZA-RT5-22-00089',samro:false,capasso:false,sampra:false,split:false},
-    ],
-    financials:{
-      collected:171000,pending:38400,nextDate:'2026-07-15',
-      remittances:[
-        {id:'r1',date:'2026-01-15',amount:54200,source:'CAPASSO Q3 2025',status:'paid'},
-        {id:'r2',date:'2025-07-15',amount:48600,source:'CAPASSO Q1 2025 + SAMRO Q2 2025',status:'paid'},
-        {id:'r3',date:'2025-01-15',amount:68200,source:'CAPASSO Q3 2024 + SAMRO Q4 2024',status:'paid'},
-      ],
-      statements:[
-        {id:'s1',source:'Electromode',period:'Jan 2024',type:'Master royalties',status:'Discrepancy flagged',flag:'Unexplained debit balance of R36,629'},
-        {id:'s2',source:'CAPASSO',period:'Q1 2024',type:'Publishing (mechanical)',status:'Reviewed'},
-        {id:'s3',source:'SAMRO',period:'Q2 2024',type:'Broadcast',status:'Reviewed'},
-        {id:'s4',source:'Electromode',period:'Q3 2022',type:'Master royalties',status:'Missing — demand sent'},
-      ],
-      cmoHistory:[
-        {cmo:'capasso',schedule:'Bi-annual',scheduleNote:'Pays in Jan & Jul',nextExpected:'Jul 2026',entries:[
-          {period:'Q3 2025',gross:67750,status:'remitted'},
-          {period:'Q1 2025',gross:42500,status:'remitted'},
-          {period:'Q3 2024',gross:55000,status:'remitted'},
-        ]},
-        {cmo:'samro',schedule:'Quarterly',scheduleNote:'Mar, Jun, Sep, Dec',nextExpected:'Sep 2026',entries:[
-          {period:'Q2 2025',gross:18250,status:'remitted'},
-          {period:'Q4 2024',gross:30250,status:'remitted'},
-          {period:'Q2 2024',gross:28400,status:'pending'},
-        ]},
-        {cmo:'sampra',schedule:'Annual',scheduleNote:'Jul each year',nextExpected:'Jul 2027 est. — pending registration',entries:[]},
-        {cmo:'airco',schedule:'Quarterly',scheduleNote:'Quarterly when registered',nextExpected:'TBD — not yet registered',entries:[]},
-      ],
-      dspHistory:[
-        {source:'Electromode (DSP)',type:'dsp',schedule:'Monthly',scheduleNote:'Streams: Spotify, Apple Music, YouTube Music etc.',nextExpected:'Ongoing monthly',entries:[
-          {period:'Q4 2025',gross:38400,status:'pending'},
-          {period:'Jan 2024',gross:null,status:'dispute',note:'R36,629 debit balance — unexplained by distributor'},
-          {period:'Q3 2022',gross:null,status:'missing'},
-        ]},
-        {source:'CRBT via MTN (Electromode)',type:'crbt',schedule:'Quarterly',scheduleNote:'Ringtone & ringback tone downloads',nextExpected:'Q1 2026 est.',note:'Est. R18k–R35k/year from MTN alone. Feeds AIRCO income once registered.',entries:[
-          {period:'Q3 2025',gross:8200,status:'pending'},
-        ]},
-      ],
-    },
-    actions:[
-      {id:'a1',type:'split_sheet',title:'Split sheet pending — VSOP feat. Reece Madlisa',detail:'The split sheet for VSOP has not been signed by all parties. Your share is confirmed at 45%. Reece Madlisa camp has not responded. Agency 5 is following up.',urgency:'amber',date:'2026-04-12'},
-      {id:'a2',type:'split_sheet',title:'Split sheet pending — Ngixolele feat. Boohle',detail:'Ngixolele split sheet unsigned. Your composition share is 50%. Agency 5 is chasing management for signature.',urgency:'amber',date:'2026-04-05'},
-      {id:'a3',type:'document',title:'SAMPRA registration — ID document required',detail:'Your SAMPRA neighbouring rights registration requires a certified copy of your ID document. Please send to Jerome at Agency 5 via WhatsApp or email.',urgency:'red',date:'2026-05-02'},
-      {id:'a4',type:'confirm',title:'Confirm Beke Le Beke composition credits',detail:'Agency 5 needs confirmation of all composition contributors to Beke Le Beke before CAPASSO notification can proceed. Please provide the full credit list.',urgency:'amber',date:'2026-04-28'},
-    ],
-    activity:[
-      {date:'2026-05-08',text:'Contract Compass analysis completed for Electromode distribution agreement — 3 red flags identified. Jerome has reviewed.',type:'compass'},
-      {date:'2026-05-03',text:'SAMPRA registration submitted. Stage 2 of 4 complete. Under review. Est. completion Q1 2026.',type:'cmo'},
-      {date:'2026-04-15',text:'Demand letter sent to Electromode regarding the unexplained R36,629 debit balance on your January 2024 statement.',type:'dispute'},
-      {date:'2026-04-12',text:'Agency 5 submitted follow-up to Reece Madlisa management regarding unsigned VSOP split sheet.',type:'action'},
-      {date:'2026-03-20',text:'Remittance of R54,200 processed — CAPASSO Q3 2025 collections net of 20% commission.',type:'payment'},
-      {date:'2026-03-01',text:'CAPASSO quarterly statement received Q3 2025. Total R67,750. No discrepancies.',type:'statement'},
-    ],
-    compass:{
-      has:true,shared:true,name:'Electromode Distribution Agreement',score:4,
-      assessment:'This agreement has several clauses that significantly favour the distributor over the artist. The auto-renewal provision and broad cross-collateralisation clause are the most concerning.',
-      redFlags:3,amberFlags:4,autoRenewal:true,noticeDeadline:'2026-09-15',daysLeft:128,
-    },
-    splitSheets:[
-      {id:'sp1',trackTitle:'VSOP feat. Reece Madlisa',status:'submitted',dateSubmitted:'2026-04-10',totalPub:100,totalMaster:0,
-        contributors:[
-          {name:'Busta 929',role:'Composer / Songwriter',pub:'45',master:'50',ipi:'',contact:''},
-          {name:'Reece Madlisa',role:'Featured Artist',pub:'35',master:'40',ipi:'',contact:''},
-          {name:'Mzu M',role:'Producer',pub:'20',master:'10',ipi:'',contact:''},
-        ]},
-    ],
-    messages:[
-      {id:'m1',from:'Jerome',initials:'JL',color:'#C9951A',text:'Hi Thapelo — the SAMPRA registration is now in progress. We submitted all documents on 3 May. You should expect confirmation within 8 to 12 weeks. Once registered, we will start tracking your neighbouring rights income.',date:'2026-05-04',fromConsultant:true},
-      {id:'m2',from:'Busta 929',initials:'B9',color:'#1A5FA3',text:'Thanks Jerome. What about the Electromode situation — any response from them on the R36k?',date:'2026-05-05',fromConsultant:false},
-      {id:'m3',from:'Jerome',initials:'JL',color:'#C9951A',text:'Not yet. We sent the formal demand letter on 15 April. They have 21 days to respond. If no response by 6 May, we escalate to a Section 65 notice. Nothing for you to do on this — we are handling it.',date:'2026-05-06',fromConsultant:true},
-    ],
-  },
-  {
-    id:'mthunzi',stageName:'Mthunzi',legalName:'Njabulo Mthunzi Ndimande',initials:'MT',color:'#0F6E56',
-    email:'mthunzi@soundclaim.co.za',password:'mthunzi1',consultant:'Jerome Lindsey Arends',plan:'Standard',
-    entity:'Space Bar Music',distributor:'Piano Hub (Kabza)',
-    cmo:{
-      samro:{status:'in_progress',stage:3,stages:['Documents prepared','Submitted','Under review','Registered'],nextExpected:'Est. Q3 2025'},
-      capasso:{status:'registered',memberNum:'',lastCollection:'Q2 2024',lastAmount:18400,nextExpected:'Q4 2025'},
-      sampra:{status:'not_registered',note:'Setup required. Agency 5 will begin SAMPRA registration once SAMRO is complete.'},
-      airco:{status:'not_registered',note:'To be assessed after SAMPRA registration.'},
-    },
-    tracks:[
-      {title:'Imithandazo',isrc:'ZA-AA3-23-00101',samro:false,capasso:true,sampra:false,split:true},
-      {title:'Amazwe feat. MaWhoo',isrc:'ZA-AA3-23-00102',samro:false,capasso:true,sampra:false,split:false},
-      {title:'Isibusiso',isrc:'ZA-AA3-23-00103',samro:false,capasso:false,sampra:false,split:false},
-      {title:'Umoya Wami',isrc:'ZA-AA3-22-00089',samro:false,capasso:true,sampra:false,split:true},
-    ],
-    financials:{
-      collected:18400,pending:0,nextDate:'2026-07-15',
-      remittances:[{id:'r1',date:'2026-01-15',amount:14720,source:'CAPASSO Q3 2025',status:'paid'}],
-      statements:[
-        {id:'s1',source:'CAPASSO',period:'Q3 2025',type:'Publishing (mechanical)',status:'Reviewed'},
-        {id:'s2',source:'Piano Hub',period:'Nov 2023',type:'Master royalties',status:'Missing — 3 periods overdue'},
-      ],
-      cmoHistory:[
-        {cmo:'capasso',schedule:'Bi-annual',scheduleNote:'Pays in Jan & Jul',nextExpected:'Jul 2026',entries:[
-          {period:'Q3 2025',gross:18400,status:'remitted'},
-          {period:'Q1 2025',gross:14200,status:'remitted'},
-        ]},
-        {cmo:'samro',schedule:'Quarterly',scheduleNote:'Mar, Jun, Sep, Dec',nextExpected:'Sep 2026',entries:[]},
-        {cmo:'sampra',schedule:'Annual',scheduleNote:'Jul each year',nextExpected:'TBD — setup required after SAMRO',entries:[]},
-        {cmo:'airco',schedule:'Quarterly',scheduleNote:'Quarterly when registered',nextExpected:'TBD — pending SAMPRA first',entries:[]},
-      ],
-      dspHistory:[
-        {source:'Piano Hub (DSP)',type:'dsp',schedule:'Semi-annual',scheduleNote:'Streams via Piano Hub / Kabza network',nextExpected:'Q3 2026',entries:[
-          {period:'Nov 2024',gross:null,status:'missing',note:'Formal notice sent by Agency 5'},
-          {period:'May 2024',gross:null,status:'missing',note:'Formal notice sent by Agency 5'},
-          {period:'Nov 2023',gross:null,status:'missing',note:'Formal notice sent by Agency 5'},
-        ]},
-      ],
-    },
-    actions:[
-      {id:'a1',type:'document',title:'Piano Hub statements — 3 periods missing',detail:'No royalty statements received from Piano Hub for November 2023, May 2024, and November 2024. Agency 5 has issued formal notice.',urgency:'red',date:'2026-04-20'},
-      {id:'a2',type:'split_sheet',title:'Amazwe — split sheet signature needed',detail:'MaWhoo camp has not signed the split sheet for Amazwe. Your share is confirmed at 50%. Agency 5 is following up.',urgency:'amber',date:'2026-03-15'},
-    ],
-    activity:[
-      {date:'2026-05-03',text:'SAMRO registration is now at stage 3 (under review). Expected completion Q3 2025.',type:'cmo'},
-      {date:'2026-04-20',text:'Formal notice sent to Piano Hub regarding 3 missing royalty statements.',type:'dispute'},
-      {date:'2026-01-15',text:'Remittance of R14,720 processed — CAPASSO Q3 2025 net of commission.',type:'payment'},
-    ],
-    compass:{has:false,shared:false},
-    splitSheets:[],
-    messages:[
-      {id:'m1',from:'Jerome',initials:'JL',color:'#C9951A',text:'Hi Njabulo — SAMRO is now in the final review stage. We expect confirmation within 4 to 6 weeks. Once registered, all past broadcast income from the Khabza album campaign will be claimable.',date:'2026-05-03',fromConsultant:true},
-    ],
-  },
-];
 
 const CMO_META={
   samro:{label:'SAMRO',color:T.samro,desc:'Performance & broadcast'},
@@ -308,8 +181,14 @@ function LoginScreen({onLogin}){
         if(pu){const a=await fetchArtistFromSupabase(pu.artist_id);onLogin(a);return;}
       }catch(e){}
     }
-    const a=ARTISTS.find(x=>x.email.toLowerCase()===email.trim().toLowerCase()&&x.password===pass.trim());
-    if(a){onLogin(a);}else{setErr('Email or password not recognised.');setLoading(false);}
+    if(authData?.session){
+      // Signed in, but this login isn't linked to an artist (e.g. an Agency 5 staff account)
+      await SUPA.auth.signOut();
+      setErr('This login is not linked to an artist profile. Contact Agency 5.');
+    }else{
+      setErr('Email or password not recognised.');
+    }
+    setLoading(false);
   }
 
   const inp={width:'100%',padding:'12px 14px',background:'rgba(255,255,255,0.05)',border:`1px solid ${T.bdrM}`,borderRadius:10,color:T.text,outline:'none',fontSize:14,fontFamily:'inherit',boxSizing:'border-box'};
@@ -344,17 +223,7 @@ function LoginScreen({onLogin}){
         </button>
       </div>
 
-      <div style={{background:T.surf,borderRadius:10,border:`1px solid ${T.bdr}`,padding:14}}>
-        <div style={{fontSize:10,color:T.sub,marginBottom:8,textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:600}}>Demo accounts</div>
-        {ARTISTS.map(a=><div key={a.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'5px 0',borderBottom:`1px solid ${T.bdr}`}}>
-          <div style={{display:'flex',alignItems:'center',gap:8}}>
-            <Av initials={a.initials} color={a.color} size={20}/>
-            <span style={{fontSize:12,color:T.sub}}>{a.email}</span>
-          </div>
-          <span style={{fontSize:11,color:T.accent,fontFamily:'DM Mono'}}>{a.password}</span>
-        </div>)}
-      </div>
-      <div style={{textAlign:'center',marginTop:12,fontSize:11,color:T.faint}}>Agency 5 (Pty) Ltd · Authorised personnel only</div>
+      <div style={{textAlign:'center',marginTop:12,fontSize:11,color:T.faint}}>Agency Five Management (Pty) Ltd · Authorised personnel only</div>
     </div>
   </div>;
 }
@@ -648,7 +517,10 @@ function SplitSheetsScreen({artist,setArtist,prefillTitle,clearPrefill}){
 
   useEffect(()=>{ if(prefillTitle) setShowForm(true); },[prefillTitle]);
 
-  function handleSubmit(data){
+  async function handleSubmit(data){
+    const lines=(data.contributors||[]).map(c=>`• ${c.name} — ${c.role}: ${c.pub||0}% publishing / ${c.master||0}% master`).join('\n');
+    const ok=await sendPortalMessage(artist,`SPLIT SHEET SUBMITTED — "${data.trackTitle}"\n${lines}\nTotals: ${data.totalPub}% publishing / ${data.totalMaster}% master`);
+    if(!ok){alert('Split sheet could not be sent to Agency 5. Check your connection and try again.');return;}
     const entry={
       id:'sp'+Date.now(),
       trackTitle:data.trackTitle,
@@ -917,6 +789,16 @@ function CompassScreen({artist}){
   </div>;
 }
 
+async function sendPortalMessage(artist,body){
+  if(!artist._fromSupabase) return false;
+  const {error}=await SUPA.from('portal_messages').insert({
+    artist_id:artist.id,from_name:artist.stageName,initials:artist.initials,color:artist.color,
+    body,from_consultant:false,sent_at:new Date().toISOString(),
+  });
+  if(error){console.error('portal_messages insert failed',error);return false;}
+  return true;
+}
+
 function MessagesScreen({artist}){
   const [msgs,setMsgs]=useState(artist.messages);
   const [input,setInput]=useState('');
@@ -926,9 +808,14 @@ function MessagesScreen({artist}){
     if(endRef.current) endRef.current.scrollIntoView({behavior:'smooth'});
   },[msgs]);
 
-  function send(){
-    if(!input.trim())return;
-    setMsgs(prev=>[...prev,{id:'n'+Date.now(),from:artist.stageName,initials:artist.initials,color:artist.color,text:input.trim(),date:new Date().toISOString(),fromConsultant:false}]);
+  const [sendErr,setSendErr]=useState('');
+  async function send(){
+    const text=input.trim();
+    if(!text)return;
+    setSendErr('');
+    const ok=await sendPortalMessage(artist,text);
+    if(!ok){setSendErr('Message not sent. Check your connection and try again.');return;}
+    setMsgs(prev=>[...prev,{id:'n'+Date.now(),from:artist.stageName,initials:artist.initials,color:artist.color,text,date:new Date().toISOString(),fromConsultant:false}]);
     setInput('');
   }
 
@@ -952,6 +839,7 @@ function MessagesScreen({artist}){
         </div>;
       })}
       <div ref={endRef}/>
+      {sendErr&&<div style={{fontSize:11,color:T.red,background:T.redBg,padding:'6px 10px',borderRadius:8,textAlign:'center'}}>{sendErr}</div>}
     </div>
     <div style={{padding:'10px 12px',borderTop:`1px solid ${T.bdr}`,display:'flex',gap:8,flexShrink:0,background:T.surf,paddingBottom:16}}>
       <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()} placeholder="Message Agency 5..." style={{flex:1,padding:'10px 14px',background:T.card,border:`1px solid ${T.bdrM}`,borderRadius:24,color:T.text,outline:'none',fontSize:13,fontFamily:'inherit'}}/>
@@ -983,7 +871,7 @@ function ProfileScreen({artist,onLogout}){
     </div>
     <button onClick={onLogout} style={{width:'100%',marginTop:24,padding:13,borderRadius:10,border:`1px solid ${T.bdrM}`,background:'transparent',color:T.sub,fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>Sign out</button>
     <div style={{textAlign:'center',marginTop:16,fontSize:10,color:T.faint,lineHeight:1.6}}>
-      Soundclaim Artist Portal v1.0<br/>Agency 5 (Pty) Ltd<br/>172 Endwell Street, Winchester Hills, Johannesburg
+      Soundclaim Artist Portal v1.1<br/>Agency Five Management (Pty) Ltd<br/>172 Endwell Street, Winchester Hills, Johannesburg
     </div>
   </div>;
 }

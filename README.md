@@ -4,12 +4,9 @@ Artist-facing portal for Soundclaim — built by Agency 5.
 
 Allows registered artists to view their CMO registration status, catalogue, financials (CMO collections + distributor income breakdown), pending actions, Contract Compass analysis, and messages from their consultant.
 
-## Demo accounts
+## Access
 
-| Artist | Email | Password |
-|--------|-------|----------|
-| Busta 929 | busta929@soundclaim.co.za | busta929 |
-| Mthunzi | mthunzi@soundclaim.co.za | mthunzi1 |
+Artists sign in with their own Supabase Auth login, linked to their artist record via `artist_portal_users`. There are no demo accounts.
 
 ## Tech
 
