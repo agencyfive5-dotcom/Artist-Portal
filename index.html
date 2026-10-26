@@ -208,7 +208,7 @@ function LoginScreen({onLogin}){
         <div style={{fontSize:13,color:T.sub,marginBottom:22}}>Your music. Your money. Your rights.</div>
         <div style={{marginBottom:12}}>
           <div style={{fontSize:12,color:T.sub,marginBottom:5,fontWeight:500}}>Email address</div>
-          <input style={inp} value={email} onChange={e=>setEmail(e.target.value)} placeholder="your.name@soundclaim.co.za" onKeyDown={e=>e.key==='Enter'&&attempt()}/>
+          <input style={inp} value={email} onChange={e=>setEmail(e.target.value)} placeholder="your@email.com" onKeyDown={e=>e.key==='Enter'&&attempt()}/>
         </div>
         <div style={{marginBottom:18}}>
           <div style={{fontSize:12,color:T.sub,marginBottom:5,fontWeight:500}}>Password</div>
